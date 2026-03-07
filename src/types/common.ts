@@ -51,3 +51,6 @@ export enum SortOrderEnum {
   ASC = 'ascend',    // 升序
   DESC = 'descend'   // 降序（后端默认）
 }
+
+// token 名称
+export const TOKEN_NAME = 'token';

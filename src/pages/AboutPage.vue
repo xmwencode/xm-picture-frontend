@@ -1,8 +1,10 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { helloApi } from '@/api/hello.ts'
+import { useUserStore } from '@/stores/user.ts'
 
 const message = ref<string>('加载中...')
+const userInfo = computed(() => useUserStore().loginUser)
 
 const fetchHello = async () => {
 
@@ -24,6 +26,11 @@ onMounted(() => {
         <p style="font-size: 16px;">接口响应数据：</p>
         <p style="font-size: 20px; font-weight: bold; color: #52c41a;">
           {{ message }}
+        </p>
+      </div>
+      <div style="margin-top: 20px;">
+        <p style="font-size: 20px; font-weight: bold; color: #6387df;">
+          {{userInfo?.username ?? ''}}
         </p>
       </div>
     </div>

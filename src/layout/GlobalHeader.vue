@@ -1,10 +1,14 @@
 <script setup lang="ts">
 import { useRouter } from 'vue-router'
-import { computed, ref } from 'vue'
-import type { MenuProps } from 'ant-design-vue'
+import { computed, onMounted, ref } from 'vue'
+import { type MenuProps, message } from 'ant-design-vue'
+import { LogoutOutlined } from '@ant-design/icons-vue'
 import { convertMenuConfigToAntdItems, menuItems } from '@/config/menuConfig.ts'
+import { useUserStore } from '@/stores/user.ts'
+import { userLogoutApi } from '@/api'
 
 const router = useRouter()
+const userStore = useUserStore()
 
 // 当前选中菜单
 const selectedKey = ref<string[]>(['/'])
@@ -24,6 +28,31 @@ const handleMenuClick: MenuProps['onClick'] = (e) => {
   // 跳转到对应路由
   router.push(key)
 }
+
+// 退出登录
+const doLogout = async () => {
+  const res = await userLogoutApi()
+  if (res.data) {
+    userStore.removeToken()
+    userStore.removeUserInfo()
+    await router.push('/user/login')
+    message.success('已退出登录')
+  }
+}
+
+// 自动登录
+const autoLogin = () => {
+  if (userStore.token && !userStore.loginUser.id) {
+    try {
+      userStore.fetchLoginUser()
+    } catch (error) {}
+  }
+}
+
+onMounted(() => {
+  autoLogin()
+})
+
 </script>
 
 <template>
@@ -48,7 +77,25 @@ const handleMenuClick: MenuProps['onClick'] = (e) => {
       <!-- 右侧：用户操作区域 -->
       <a-col flex="100px">
         <div class="user-login-status">
-          <a-button type="primary">登录</a-button>
+          <div v-if="userStore.loginUser.id" class="user-info">
+            <a-dropdown>
+              <a-space>
+                <a-avatar :src="userStore.loginUser.avatar">
+                  {{ userStore.loginUser.avatar ?? (userStore.loginUser.username?.charAt(0)?.toUpperCase()) }}
+                </a-avatar>
+                {{ userStore.loginUser.nickname ?? '无名' }}
+              </a-space>
+              <template #overlay>
+                <a-menu>
+                  <a-menu-item @click="doLogout">
+                    <LogoutOutlined />
+                    退出登录
+                  </a-menu-item>
+                </a-menu>
+              </template>
+            </a-dropdown>
+          </div>
+          <a-button v-else type="primary" @click="$router.push('/user/login')">登录 </a-button>
         </div>
       </a-col>
     </a-row>
