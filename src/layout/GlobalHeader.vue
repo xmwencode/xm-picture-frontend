@@ -80,8 +80,9 @@ onMounted(() => {
           <div v-if="userStore.loginUser.id" class="user-info">
             <a-dropdown>
               <a-space>
-                <a-avatar :src="userStore.loginUser.avatar">
-                  {{ userStore.loginUser.avatar ?? (userStore.loginUser.username?.charAt(0)?.toUpperCase()) }}
+                <a-avatar v-if="userStore.loginUser.avatar" :src="userStore.loginUser.avatar" />
+                <a-avatar v-else :style="{ backgroundColor: '#1890ff' }">
+                  {{ userStore.loginUser.username?.charAt(0)?.toUpperCase() }}
                 </a-avatar>
                 {{ userStore.loginUser.nickname ?? '无名' }}
               </a-space>
@@ -99,6 +100,7 @@ onMounted(() => {
         </div>
       </a-col>
     </a-row>
+    <a-divider style="margin-top: 0" />
   </a-layout-header>
 </template>
 

@@ -1,7 +1,10 @@
 import router from '@/router'
-import { HomeOutlined, LikeOutlined } from '@ant-design/icons-vue'
+import { HomeOutlined, LikeOutlined, UserOutlined } from '@ant-design/icons-vue'
 import { h } from 'vue'
 import type { RouteRecordRaw } from 'vue-router'
+import { checkAccess } from '@/auth/checkAccess.ts'
+import type { UserRoleEnum } from '@/enums/UserRoleEnum.ts'
+import { useUserStore } from '@/stores/user.ts'
 
 // 菜单配置项类型
 export interface MenuConfig {
@@ -21,11 +24,17 @@ export const menuItems: MenuConfig[] = [
     icon: () => h(HomeOutlined),
   },
   {
+    name: 'UserManager',
+    label: '用户管理',
+    title: '用户管理',
+    icon: () => h(UserOutlined)
+  },
+  {
     name: 'About',
     label: '关于',
     title: '关于',
     icon: () => h(LikeOutlined),
-  }
+  },
 ]
 
 // 查找路由配置（递归查找嵌套路由）
@@ -47,11 +56,14 @@ const convertMenuToAntdItem = (menu: MenuConfig): any => {
   // 递归查找路由（支持嵌套）
   const allRoutes = router.getRoutes()
   const route = allRoutes.find(r => r.name === menu.name)
-  
+
   if (!route) {
     console.warn(`未找到菜单 ${menu.name} 对应的路由`)
     return null
   }
+
+  // 进行权限校验
+  if (!checkAccess(useUserStore().loginUser, route.meta?.access as UserRoleEnum[])) return null
 
   const antdItem: any = {
     key: route.path,        // 使用路由path作为key
