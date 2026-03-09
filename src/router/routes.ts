@@ -35,5 +35,21 @@ export const routes = [
     meta: {
       access: [UserRoleEnum.ADMIN]
     }
-  }
+  },
+  {
+    path: '/picture/add',
+    name: 'AddPicture',
+    component: () => import('@/pages/picture/PictureHandlePage.vue'),
+    meta: {
+      access: [UserRoleEnum.ADMIN, UserRoleEnum.USER]
+    }
+  },
+  {
+    path: '/picture/manager',
+    name: 'PictureManager',
+    component: () => import('@/pages/picture/PictureManagerPage.vue'),
+    meta: {
+      access: [UserRoleEnum.ADMIN]
+    }
+  },
 ]

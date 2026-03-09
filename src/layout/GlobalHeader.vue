@@ -45,7 +45,10 @@ const autoLogin = () => {
   if (userStore.token && !userStore.loginUser.id) {
     try {
       userStore.fetchLoginUser()
-    } catch (error) {}
+    } catch (error) {
+      userStore.removeToken()
+      userStore.removeUserInfo()
+    }
   }
 }
 

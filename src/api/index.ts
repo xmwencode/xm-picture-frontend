@@ -1,2 +1,4 @@
 export * from './hello'
-export * from './user.ts'
+export * from './user'
+export * from './category'
+export * from './picture'

@@ -1,5 +1,10 @@
 import router from '@/router'
-import { HomeOutlined, LikeOutlined, UserOutlined } from '@ant-design/icons-vue'
+import {
+  AppstoreAddOutlined,
+  HomeOutlined,
+  LikeOutlined, PictureOutlined,
+  UserOutlined
+} from '@ant-design/icons-vue'
 import { h } from 'vue'
 import type { RouteRecordRaw } from 'vue-router'
 import { checkAccess } from '@/auth/checkAccess.ts'
@@ -24,10 +29,22 @@ export const menuItems: MenuConfig[] = [
     icon: () => h(HomeOutlined),
   },
   {
+    name: 'AddPicture',
+    label: '新建图片',
+    title: '新建图片',
+    icon: () => h(AppstoreAddOutlined),
+  },
+  {
     name: 'UserManager',
     label: '用户管理',
     title: '用户管理',
     icon: () => h(UserOutlined)
+  },
+  {
+    name: 'PictureManager',
+    label: '图片管理',
+    title: '图片管理',
+    icon: () => h(PictureOutlined),
   },
   {
     name: 'About',
