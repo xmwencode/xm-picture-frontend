@@ -2,8 +2,8 @@
 import PictureUpload from '@/components/PictureUpload.vue'
 import { computed, onMounted, reactive, ref } from 'vue'
 import { useRoute } from 'vue-router'
-import type { PictureEditRequest, PictureVO } from '@/types'
-import { editPictureApi, getPictureByIdApi } from '@/api'
+import type { Category, PictureEditRequest, PictureVO } from '@/types'
+import { editPictureApi, getCategoryListApi, getPictureByIdApi } from '@/api'
 import { message } from 'ant-design-vue'
 import UrlPictureUpload from '@/components/UrlPictureUpload.vue'
 
@@ -21,6 +21,8 @@ const pictureId = computed(() => {
   return route.query?.id as string ?? ''
 })
 
+const categoryList = ref<Category[]>([])
+
 const handleSuccess = (data: PictureVO) => {
   picture.value = data
   formData.id = data.id
@@ -36,6 +38,8 @@ const handleSubmit = async () => {
     const res = await editPictureApi(formData)
     if (res.data) {
       message.success('修改成功')
+      // 返回上一页
+      history.back()
     } else {
       message.error('修改失败')
     }
@@ -59,8 +63,17 @@ const fetchPicture = async () => {
   }
 }
 
+// 获取分类
+const fetchCategoryList = async () => {
+  const res = await getCategoryListApi()
+  if (res.data) {
+    categoryList.value = res.data
+  }
+}
+
 onMounted(() => {
   fetchPicture()
+  fetchCategoryList()
 })
 
 </script>
@@ -100,7 +113,14 @@ onMounted(() => {
         <a-form-item label="图片简介" name="introduction">
           <a-textarea rows="3" v-model:value="formData.introduction" />
         </a-form-item>
-        <!-- TODO: 图片分类 -->
+        <!-- 图片分类 -->
+        <a-form-item label="图片分类" name="categoryId">
+          <a-select v-model:value="formData.categoryId" placeholder="请选择图片分类" allow-clear>
+            <a-select-option v-for="category in categoryList" :key="category.id" :value="category.id">
+              {{ category.name }}
+            </a-select-option>
+          </a-select>
+        </a-form-item>
         <!-- TODO: 图片标签 -->
         <!-- 确认按钮 -->
         <a-form-item>

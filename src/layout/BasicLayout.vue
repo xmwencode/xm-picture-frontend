@@ -28,6 +28,6 @@ import GlobalFooter from '@/layout/GlobalFooter.vue'
   padding: 24px;
   background: white;
   width: 100%;
-  margin: 16px auto 56px;
+  margin: 56px auto;
 }
 </style>

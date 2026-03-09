@@ -1,17 +1,18 @@
 <script setup lang="ts">
-import type { Category, Picture, PictureQueryRequest } from '@/types'
+import type { Category, CategoryQueryRequest } from '@/types'
 import { computed, createVNode, onMounted, reactive, ref } from 'vue'
 
 import { message, Modal } from 'ant-design-vue'
 import dayjs, { type Dayjs } from 'dayjs'
 import { ExclamationCircleOutlined, SearchOutlined, PlusCircleOutlined } from '@ant-design/icons-vue'
-import { deletePictureApi, getCategoryListApi, listPictureByPageApi } from '@/api'
+import { deleteCategoryApi, getCategoryListApi, listCategoryByPageApi } from '@/api'
 import { formatDate } from '@/utils/DayUtils.ts'
 import { useRoute, useRouter } from 'vue-router'
+import CategoryHandleModal from '@/components/CategoryHandleModal.vue'
 
 type RangeValue = [Dayjs, Dayjs]
 
-const searchForm = reactive<PictureQueryRequest>({
+const searchForm = reactive<CategoryQueryRequest>({
   current: 1,
   pageSize: 5,
 })
@@ -19,21 +20,22 @@ const searchForm = reactive<PictureQueryRequest>({
 const dataRange = ref<RangeValue>()
 const router = useRouter()
 const categoryList = ref<Category[]>([])
+const modalVisible = ref(false)
+const currentCategory = ref()
+const isEdit = ref(false)
 
 // 新增
 const handleAdd = () => {
-  router.push({ path: `/picture/add` })
+  isEdit.value = false
+  currentCategory.value = undefined
+  modalVisible.value = true
 }
 
 // 编辑
 const handleEdit = (record: any) => {
-  const pictureId = record.id
-  router.push({
-    path: `/picture/add`,
-    query: {
-      id: pictureId,
-    },
-  })
+  isEdit.value = true
+  currentCategory.value = record
+  modalVisible.value = true
 }
 
 // 删除
@@ -46,7 +48,7 @@ const handleDelete = (record: any) => {
     okType: 'danger',
     cancelText: '取消',
     onOk: async () => {
-      const res = await deletePictureApi({
+      const res = await deleteCategoryApi({
         id: record.id,
       })
       if (res.data) {
@@ -60,24 +62,29 @@ const handleDelete = (record: any) => {
   })
 }
 
-const dataList = ref<Picture[]>([])
+const onSuccess = () => {
+  modalVisible.value = false
+  freshData()
+}
+
+const dataList = ref<Category[]>([])
 const total = ref(0)
 const loading = ref(false)
 
 const columns = [
   {
-    title: '图片ID&名称',
-    dataIndex: 'id&name',
+    title: '分类ID',
+    dataIndex: 'id',
     align: 'center',
   },
   {
-    title: '图片',
-    dataIndex: 'url',
+    title: '分类名称',
+    dataIndex: 'name',
     align: 'center',
   },
   {
-    title: '分类',
-    dataIndex: 'category',
+    title: '分类描述',
+    dataIndex: 'description',
     align: 'center',
   },
   {
@@ -113,7 +120,7 @@ const handleSubmit = () => {
 const freshData = async () => {
   loading.value = true
   try {
-    const res = await listPictureByPageApi(searchForm)
+    const res = await listCategoryByPageApi(searchForm)
     if (res.data) {
       total.value = res.data.total ?? 0
       dataList.value = res.data.records ?? []
@@ -169,28 +176,28 @@ onMounted(() => {
 </script>
 
 <template>
-  <div id="picture-manager-page">
+  <div id="category-manager-page">
     <!-- 标题栏 -->
-    <div class="picture-manager-title">
-      <a-typography-title :level="3">图片管理</a-typography-title>
-      <div class="picture-manager-options">
+    <div class="category-manager-title">
+      <a-typography-title :level="3">分类管理</a-typography-title>
+      <div class="category-manager-options">
         <a-button @click="handleAdd" type="primary">
           <template #icon>
             <PlusCircleOutlined />
           </template>
-          新增图片
+          新增分类
         </a-button>
       </div>
     </div>
     <!-- 搜索表单 -->
-    <div class="picture-search">
+    <div class="category-search">
       <a-form style="display: flex" :model="searchForm" autocomplete="off" @finish="handleSubmit">
         <a-space :size="20">
-          <!--  图片ID  -->
+          <!--  分类ID  -->
           <a-form-item>
             <a-input
               style="min-width: 120px"
-              placeholder="请输入图片ID"
+              placeholder="请输入分类ID"
               allow-clear
               v-model:value="searchForm.id"
             />
@@ -203,19 +210,6 @@ onMounted(() => {
               allow-clear
               v-model:value="searchForm.text"
             />
-          </a-form-item>
-          <!--  分类  -->
-          <a-form-item>
-            <a-select
-              style="min-width: 120px"
-              placeholder="请选择分类"
-              allow-clear
-              v-model:value="searchForm.categoryId"
-            >
-              <a-select-option v-for="category in categoryList" :value="category.id">
-                {{ category.name }}
-              </a-select-option>
-            </a-select>
           </a-form-item>
           <!--  创建时间  -->
           <a-form-item>
@@ -243,7 +237,7 @@ onMounted(() => {
     </div>
 
     <!-- 数据列表 -->
-    <div class="picture-list">
+    <div class="category-list">
       <a-table
         :columns="columns"
         :data-source="dataList"
@@ -253,17 +247,16 @@ onMounted(() => {
         :scroll="{ y: 400 }"
       >
         <template #bodyCell="{ column, record }">
-          <template v-if="column.dataIndex === 'id&name'">
+          <template v-if="column.dataIndex === 'id'">
             <a-space direction="vertical">
               <a-typography-text type="secondary">{{ record.id }}</a-typography-text>
-              <a-typography-text>{{ record.name }}</a-typography-text>
             </a-space>
           </template>
-          <template v-if="column.dataIndex === 'category'">
-            <a-tag> {{ record.categoryDTO?.name ?? '-' }}</a-tag>
+          <template v-if="column.dataIndex === 'name'">
+            <a-typography-text>{{ record.name }}</a-typography-text>
           </template>
-          <template v-if="column.dataIndex === 'url'">
-            <a-image v-if="record.url" :src="record.url" />
+          <template v-if="column.dataIndex === 'description'">
+            <a-typography-text :ellipsis="true">{{ record.description }}</a-typography-text>
           </template>
           <template v-if="column.dataIndex === 'createTime'">
             <span>{{ formatDate(record.createTime) }}</span>
@@ -278,11 +271,17 @@ onMounted(() => {
         </template>
       </a-table>
     </div>
+    <CategoryHandleModal
+      v-model:visible="modalVisible"
+      :is-edit="isEdit"
+      :category="currentCategory"
+      @success="onSuccess"
+    />
   </div>
 </template>
 
 <style scoped>
-#picture-manager-page {
+#category-manager-page {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -291,7 +290,7 @@ onMounted(() => {
   height: 100%;
 }
 
-.picture-manager-title {
+.category-manager-title {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -299,13 +298,13 @@ onMounted(() => {
   margin-top: 20px;
 }
 
-.picture-search {
+.category-search {
   margin-top: 20px;
   width: 90%;
   height: 80px;
 }
 
-.picture-list {
+.category-list {
   width: 90%;
   height: 500px;
 }

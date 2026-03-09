@@ -59,7 +59,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <a-layout-header class="global-header">
+  <a-layout-header class="global-header" :style="{ position: 'fixed', zIndex: 1, width: '100%' }">
     <a-row :wrap="false">
       <!-- 左侧： logo 与 标题 -->
       <a-col flex="300px">

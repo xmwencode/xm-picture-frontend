@@ -41,7 +41,7 @@ export const menuItems: MenuConfig[] = [
     icon: () => h(UserOutlined)
   },
   {
-    name: 'PictureManager',
+    name: 'PictureManagerBasic',
     label: '图片管理',
     title: '图片管理',
     icon: () => h(PictureOutlined),

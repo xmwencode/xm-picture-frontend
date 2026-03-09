@@ -1,6 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import { routes } from './routes.ts'
-import type { UserRoleEnum } from '@/enums/UserRoleEnum.ts'
+import { UserRoleEnum } from '@/enums/UserRoleEnum.ts'
 import { useUserStore } from '@/stores/user.ts'
 import { checkAccess } from '@/auth/checkAccess.ts'
 import { message } from 'ant-design-vue'
@@ -31,7 +31,7 @@ router.beforeEach(async (to, from) => {
   }
 
   // 未登录，跳转到登录页
-  if (!userStore.loginUser || !userStore.loginUser.role) {
+  if (!userStore.loginUser || userStore.loginUser.role===UserRoleEnum.NOT_LOGIN) {
     return {
       path: '/user/login'
     }

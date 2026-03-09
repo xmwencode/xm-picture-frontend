@@ -45,11 +45,24 @@ export const routes = [
     }
   },
   {
-    path: '/picture/manager',
-    name: 'PictureManager',
-    component: () => import('@/pages/picture/PictureManagerPage.vue'),
+    path: '/picture',
+    name: 'PictureManagerBasic',
+    component: () => import('@/pages/picture/PictureManagerBasicPage.vue'),
+    redirect: '/picture/manager',
     meta: {
-      access: [UserRoleEnum.ADMIN]
-    }
+      access: [UserRoleEnum.ADMIN],
+    },
+    children: [
+      {
+        path: '/picture/manager',
+        name: 'PictureManager',
+        component: () => import('@/pages/picture/PictureManagerPage.vue'),
+      },
+      {
+        path: '/category/manager',
+        name: 'CategoryManager',
+        component: () => import('@/pages/picture/CategoryManagerPage.vue'),
+      },
+    ],
   },
 ]
