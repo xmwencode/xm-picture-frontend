@@ -18,7 +18,7 @@ export const updateCategoryApi = (data: CategoryUpdateRequest) => {
 }
 
 export const deleteCategoryApi = (data: DeleteRequest) => {
-  return request.delete(`/category/delete/${data}`)
+  return request.post(`/category/delete`, data)
 }
 
 

@@ -1,5 +1,12 @@
 import request from '@/api/requet.ts'
-import type { ApiResponse, DeleteRequest, PictureQueryRequest, PictureUploadRequest, PictureVO } from '@/types'
+import type {
+  ApiResponse,
+  DeleteRequest,
+  PictureQueryRequest,
+  PictureReviewRequest,
+  PictureUploadRequest,
+  PictureVO
+} from '@/types'
 
 /**
  * 上传图片文件
@@ -61,4 +68,8 @@ export const getPictureByIdApi = (id: string) => {
 
 export const getPictureVOByIdApi = (id: string) => {
   return request.get(`/picture/vo/${id}`)
+}
+
+export const reviewPictureApi = (data: PictureReviewRequest) => {
+  return request.post('/picture/review', data)
 }

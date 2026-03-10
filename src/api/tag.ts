@@ -18,7 +18,7 @@ export const updateTagApi = (data: TagUpdateRequest) => {
 }
 
 export const deleteTagApi = (data: DeleteRequest) => {
-  return request.delete(`/tag/delete/${data}`)
+  return request.post('/tag/delete', data)
 }
 
 

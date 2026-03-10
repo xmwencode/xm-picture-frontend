@@ -1,12 +1,13 @@
 <script setup lang="ts">
-import type { Category, Picture, PictureQueryRequest, Tag } from '@/types'
+import type { Category, Picture, PictureQueryRequest, PictureReviewRequest, Tag } from '@/types'
 import { computed, createVNode, onMounted, reactive, ref } from 'vue'
 
 import { message, Modal } from 'ant-design-vue'
 import dayjs, { type Dayjs } from 'dayjs'
 import { ExclamationCircleOutlined, SearchOutlined, PlusCircleOutlined } from '@ant-design/icons-vue'
-import { deletePictureApi, getCategoryListApi, getTagListApi, listPictureByPageApi } from '@/api'
+import { deletePictureApi, getCategoryListApi, getTagListApi, listPictureByPageApi, reviewPictureApi } from '@/api'
 import { useRouter } from 'vue-router'
+import { getReviewStatusColor, getReviewStatusText, PictureReviewStatusEnum, PictureReviewStatusMap } from '@/enums'
 
 type RangeValue = [Dayjs, Dayjs]
 
@@ -60,6 +61,41 @@ const handleDelete = (record: any) => {
   })
 }
 
+// 查看
+const handleView = (record: any) => {
+  router.push({
+    path: `/picture/view`,
+    query: {
+      id: record.id,
+    },
+  })
+}
+
+// 审核
+const handleReview = async (record: any, status: number) => {
+  const reviewMessage= status === PictureReviewStatusEnum.PASS ? '管理员操作通过' : '管理员操作拒绝'
+  Modal.confirm({
+    title: '图片审核',
+    icon: createVNode(ExclamationCircleOutlined),
+    content: '你确定执行该审核吗？',
+    okText: '确定',
+    cancelText: '取消',
+    onOk: async () => {
+      const res = await reviewPictureApi({
+        id: record.id,
+        reviewStatus: status,
+        reviewMessage: reviewMessage
+      })
+      if (res.data) {
+        message.success('审核操作成功')
+        await freshData()
+      } else {
+        message.error('审核操作失败')
+      }
+    },
+  })
+}
+
 const dataList = ref<Picture[]>([])
 const total = ref(0)
 const loading = ref(false)
@@ -83,6 +119,11 @@ const columns = [
   {
     title: '创建人&创建时间',
     dataIndex: 'nickname&createTime',
+    align: 'center',
+  },
+  {
+    title: '审核信息',
+    dataIndex: 'reviewInfo',
     align: 'center',
   },
   {
@@ -192,6 +233,7 @@ onMounted(() => {
         </a-button>
       </div>
     </div>
+
     <!-- 搜索表单 -->
     <div class="picture-search">
       <a-form style="display: flex" :model="searchForm" autocomplete="off" @finish="handleSubmit">
@@ -241,6 +283,23 @@ onMounted(() => {
               </a-select-option>
             </a-select>
           </a-form-item>
+          <!-- 审核状态 -->
+          <a-form-item>
+            <a-select
+              style="min-width: 140px"
+              placeholder="请选择审核状态"
+              allow-clear
+              v-model:value="searchForm.reviewStatus"
+            >
+              <a-select-option
+                v-for="(label, value) in PictureReviewStatusMap"
+                :key="value"
+                :value="Number(value)"
+              >
+                {{ label }}
+              </a-select-option>
+            </a-select>
+          </a-form-item>
           <!--  创建时间  -->
           <a-form-item>
             <a-range-picker
@@ -253,7 +312,7 @@ onMounted(() => {
               allow-clear
             />
           </a-form-item>
-
+          <!-- 搜索按钮 -->
           <a-form-item>
             <a-button style="width: 100px" type="primary" html-type="submit">
               <template #icon>
@@ -285,7 +344,7 @@ onMounted(() => {
           </template>
           <template v-if="column.dataIndex === 'category&tag'">
             <a-space direction="vertical">
-              <a-tag> {{ record.categoryDTO?.name ?? '-' }}</a-tag>
+              <a-tag> {{ record.categoryDTO?.name ?? '暂无分类' }}</a-tag>
               <a-tag :color="tag.color" v-for="tag in record.tagDTOList" :key="tag.id"> {{ tag.name }}</a-tag>
             </a-space>
           </template>
@@ -298,11 +357,43 @@ onMounted(() => {
               <a-typography-text>{{ record.createTime }}</a-typography-text>
             </a-space>
           </template>
+          <template v-if="column.dataIndex === 'reviewInfo'">
+            <a-space direction="vertical">
+              <!-- 审核人 -->
+              <a-space direction="vertical" v-if="record.reviewUserId">
+                <a-typography-text type="secondary">{{ record.reviewUserId }} 审核</a-typography-text>
+              </a-space>
+              <!-- 审核状态 -->
+              <a-space>
+                审核状态:
+                <a-tag :color="getReviewStatusColor(record.reviewStatus)">
+                  {{ getReviewStatusText(record.reviewStatus) }}
+                </a-tag>
+              </a-space>
+              <!-- 审核信息 -->
+              <a-typography-text :type="getReviewStatusColor(record.reviewStatus)">
+                {{ record.reviewMessage }}
+              </a-typography-text>
+            </a-space>
+          </template>
           <template v-if="column.key === 'action'">
-            <a-space>
-              <a-button type="link" @click="handleEdit(record)">编辑</a-button>
-              <a-divider type="vertical" />
-              <a-button type="link" danger @click="handleDelete(record)">删除</a-button>
+            <a-space direction="vertical">
+              <a-button
+                v-if="record.reviewStatus !== PictureReviewStatusEnum.PASS"
+                type="link"
+                @click="handleReview(record, PictureReviewStatusEnum.PASS)"
+              >
+                通过
+              </a-button>
+              <a-button
+                v-if="record.reviewStatus !== PictureReviewStatusEnum.REJECT"
+                type="link" danger
+                @click="handleReview(record, PictureReviewStatusEnum.REJECT)"
+              >
+                拒绝
+              </a-button>
+              <a-button size="small" ghost type="primary" @click="handleEdit(record)">编辑</a-button>
+              <a-button size="small" ghost type="dashed" danger @click="handleDelete(record)">删除</a-button>
             </a-space>
           </template>
         </template>

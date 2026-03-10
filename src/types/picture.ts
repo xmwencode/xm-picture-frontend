@@ -15,6 +15,10 @@ export interface Picture {
   picFormat?: string
   userId?: string
   userDTO?: User
+  reviewStatus?: number
+  reviewMessage?: string
+  reviewUserId?: string
+  reviewTime?: string
 }
 
 export interface PictureUploadRequest {
@@ -72,4 +76,13 @@ export interface PictureQueryRequest extends PageParams {
   picHeight?: number
   picScale?: number
   picFormat?: string
+  reviewStatus?: number
+  reviewMessage?: string
+  reviewUserId?: string
+}
+
+export interface PictureReviewRequest {
+  id: string
+  reviewStatus: number
+  reviewMessage?: string
 }
