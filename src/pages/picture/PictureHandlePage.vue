@@ -2,8 +2,8 @@
 import PictureUpload from '@/components/PictureUpload.vue'
 import { computed, onMounted, reactive, ref } from 'vue'
 import { useRoute } from 'vue-router'
-import type { Category, PictureEditRequest, PictureVO } from '@/types'
-import { editPictureApi, getCategoryListApi, getPictureByIdApi } from '@/api'
+import type { Category, PictureEditRequest, PictureVO, Tag } from '@/types'
+import { editPictureApi, getCategoryListApi, getPictureByIdApi, getTagListApi } from '@/api'
 import { message } from 'ant-design-vue'
 import UrlPictureUpload from '@/components/UrlPictureUpload.vue'
 
@@ -15,6 +15,7 @@ const formData = reactive<PictureEditRequest>({
   introduction: '',
   categoryId: '',
   url: '',
+  tagIds: [],
 })
 const uploadType = ref<'file' | 'url'>('file')
 const pictureId = computed(() => {
@@ -22,6 +23,7 @@ const pictureId = computed(() => {
 })
 
 const categoryList = ref<Category[]>([])
+const tagList = ref<Tag[]>([])
 
 const handleSuccess = (data: PictureVO) => {
   picture.value = data
@@ -30,6 +32,7 @@ const handleSuccess = (data: PictureVO) => {
   formData.introduction = data.introduction
   formData.categoryId = data.categoryId
   formData.url = data.url
+  formData.tagIds = data.tagDTOList?.map((tag) => tag.id) ?? []
 }
 
 // 提交表单
@@ -60,6 +63,7 @@ const fetchPicture = async () => {
     formData.introduction = res.data.introduction
     formData.categoryId = res.data.categoryId
     formData.url = res.data.url
+    formData.tagIds = res.data.tagDTOList?.map((tag: Tag) => tag.id) ?? []
   }
 }
 
@@ -71,9 +75,18 @@ const fetchCategoryList = async () => {
   }
 }
 
+// 获取标签
+const fetchTagList = async () => {
+  const res = await getTagListApi()
+  if (res.data) {
+    tagList.value = res.data
+  }
+}
+
 onMounted(() => {
   fetchPicture()
   fetchCategoryList()
+  fetchTagList()
 })
 
 </script>
@@ -121,7 +134,20 @@ onMounted(() => {
             </a-select-option>
           </a-select>
         </a-form-item>
-        <!-- TODO: 图片标签 -->
+        <!--  图片标签  -->
+        <a-form-item>
+          <a-select
+            style="min-width: 240px"
+            mode="multiple"
+            placeholder="请选择标签"
+            allow-clear
+            v-model:value="formData.tagIds"
+          >
+            <a-select-option v-for="tag in tagList" :value="tag.id">
+              <a-tag :color="tag.color">{{ tag.name }}</a-tag>
+            </a-select-option>
+          </a-select>
+        </a-form-item>
         <!-- 确认按钮 -->
         <a-form-item>
           <a-button style="width: 100%" type="default" html-type="submit"> 确认 </a-button>

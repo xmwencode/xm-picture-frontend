@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { FileImageOutlined, AppstoreOutlined } from '@ant-design/icons-vue'
+import { FileImageOutlined, AppstoreOutlined, TagsOutlined } from '@ant-design/icons-vue'
 import { h } from 'vue'
 
 const route = useRoute()
@@ -20,6 +20,12 @@ const sideMenuItems = ref([
     title: '分类管理',
     icon: () => h(AppstoreOutlined),
   },
+  {
+    key: '/tag/manager',
+    label: '标签管理',
+    title: '标签管理',
+    icon: () => h(TagsOutlined),
+  }
 ])
 
 // 当前选中的菜单项

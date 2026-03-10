@@ -63,6 +63,11 @@ export const routes = [
         name: 'CategoryManager',
         component: () => import('@/pages/picture/CategoryManagerPage.vue'),
       },
+      {
+        path: '/tag/manager',
+        name: 'TagManager',
+        component: () => import('@/pages/picture/TagManagerPage.vue'),
+      },
     ],
   },
 ]

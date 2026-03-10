@@ -43,9 +43,14 @@ export const useUserStore = defineStore('user', () => {
   }
 
   const fetchLoginUser = async () => {
-    const res = await getLoginUserApi()
-    if (res.data) {
-      setUserInfo(res.data)
+    try {
+      const res = await getLoginUserApi()
+      if (res.data) {
+        setUserInfo(res.data)
+      }
+    } catch (e) {
+      removeUserInfo()
+      removeToken()
     }
   }
 

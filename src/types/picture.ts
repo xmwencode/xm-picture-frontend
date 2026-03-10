@@ -1,4 +1,4 @@
-import type { Category, PageParams, User } from '@/types'
+import type { Category, PageParams, Tag, User } from '@/types'
 
 export interface Picture {
   id: string
@@ -30,13 +30,14 @@ export interface PictureVO {
   createTime: string
   categoryId?: string
   categoryName?: string
+  tagDTOList?: Tag[]
   picSize?: number
   picWidth?: number
   picHeight?: number
   picScale?: number
   picFormat?: string
   userId?: string
-  userDTO?: User
+  userNickname?: string
 }
 
 export interface PictureUpdateRequest {
@@ -45,6 +46,7 @@ export interface PictureUpdateRequest {
   url?: string
   introduction?: string
   categoryId?: string
+  tagIds?: string[]
 }
 
 export interface PictureEditRequest {
@@ -53,6 +55,7 @@ export interface PictureEditRequest {
   url?: string
   introduction?: string
   categoryId?: string
+  tagIds?: string[]
 }
 
 export interface PictureQueryRequest extends PageParams {
@@ -60,6 +63,7 @@ export interface PictureQueryRequest extends PageParams {
   text?: string
   url?: string
   categoryId?: string
+  tagIds?: string[]
   userId?: string
   startTime?: string
   endTime?: string

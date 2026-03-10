@@ -1,39 +1,41 @@
 <script setup lang="ts">
-import type { Category, Picture, PictureQueryRequest, Tag } from '@/types'
+import type { Tag, TagQueryRequest } from '@/types'
 import { computed, createVNode, onMounted, reactive, ref } from 'vue'
 
 import { message, Modal } from 'ant-design-vue'
 import dayjs, { type Dayjs } from 'dayjs'
 import { ExclamationCircleOutlined, SearchOutlined, PlusCircleOutlined } from '@ant-design/icons-vue'
-import { deletePictureApi, getCategoryListApi, getTagListApi, listPictureByPageApi } from '@/api'
-import { useRouter } from 'vue-router'
+import { deleteTagApi, getTagListApi, listTagByPageApi } from '@/api'
+import { formatDate } from '@/utils/DayUtils.ts'
+import { useRoute, useRouter } from 'vue-router'
+import TagHandleModal from '@/components/TagHandleModal.vue'
 
 type RangeValue = [Dayjs, Dayjs]
 
-const searchForm = reactive<PictureQueryRequest>({
+const searchForm = reactive<TagQueryRequest>({
   current: 1,
   pageSize: 5,
 })
 
 const dataRange = ref<RangeValue>()
 const router = useRouter()
-const categoryList = ref<Category[]>([])
 const tagList = ref<Tag[]>([])
+const modalVisible = ref(false)
+const currentTag = ref()
+const isEdit = ref(false)
 
 // 新增
 const handleAdd = () => {
-  router.push({ path: `/picture/add` })
+  isEdit.value = false
+  currentTag.value = undefined
+  modalVisible.value = true
 }
 
 // 编辑
 const handleEdit = (record: any) => {
-  const pictureId = record.id
-  router.push({
-    path: `/picture/add`,
-    query: {
-      id: pictureId,
-    },
-  })
+  isEdit.value = true
+  currentTag.value = record
+  modalVisible.value = true
 }
 
 // 删除
@@ -46,7 +48,7 @@ const handleDelete = (record: any) => {
     okType: 'danger',
     cancelText: '取消',
     onOk: async () => {
-      const res = await deletePictureApi({
+      const res = await deleteTagApi({
         id: record.id,
       })
       if (res.data) {
@@ -60,29 +62,39 @@ const handleDelete = (record: any) => {
   })
 }
 
-const dataList = ref<Picture[]>([])
+const onSuccess = () => {
+  modalVisible.value = false
+  freshData()
+}
+
+const dataList = ref<Tag[]>([])
 const total = ref(0)
 const loading = ref(false)
 
 const columns = [
   {
-    title: '图片ID&名称',
-    dataIndex: 'id&name',
+    title: '标签ID',
+    dataIndex: 'id',
     align: 'center',
   },
   {
-    title: '图片',
-    dataIndex: 'url',
+    title: '标签名称',
+    dataIndex: 'name',
     align: 'center',
   },
   {
-    title: '分类&标签',
-    dataIndex: 'category&tag',
+    title: '标签颜色',
+    dataIndex: 'color',
     align: 'center',
   },
   {
-    title: '创建人&创建时间',
-    dataIndex: 'nickname&createTime',
+    title: '标签描述',
+    dataIndex: 'description',
+    align: 'center',
+  },
+  {
+    title: '创建时间',
+    dataIndex: 'createTime',
     align: 'center',
   },
   {
@@ -113,7 +125,7 @@ const handleSubmit = () => {
 const freshData = async () => {
   loading.value = true
   try {
-    const res = await listPictureByPageApi(searchForm)
+    const res = await listTagByPageApi(searchForm)
     if (res.data) {
       total.value = res.data.total ?? 0
       dataList.value = res.data.records ?? []
@@ -154,14 +166,6 @@ const rangePresets = ref([
   { label: '过去 90 天', value: [dayjs().add(-90, 'd'), dayjs()] },
 ])
 
-// 获取分类
-const fetchCategoryList = async () => {
-  const res = await getCategoryListApi()
-  if (res.data) {
-    categoryList.value = res.data
-  }
-}
-
 // 获取标签
 const fetchTagList = async () => {
   const res = await getTagListApi()
@@ -170,37 +174,35 @@ const fetchTagList = async () => {
   }
 }
 
-
 onMounted(() => {
-  fetchCategoryList()
   fetchTagList()
   freshData()
 })
 </script>
 
 <template>
-  <div id="picture-manager-page">
+  <div id="tag-manager-page">
     <!-- 标题栏 -->
-    <div class="picture-manager-title">
-      <a-typography-title :level="3">图片管理</a-typography-title>
-      <div class="picture-manager-options">
+    <div class="tag-manager-title">
+      <a-typography-title :level="3">标签管理</a-typography-title>
+      <div class="tag-manager-options">
         <a-button @click="handleAdd" type="primary">
           <template #icon>
             <PlusCircleOutlined />
           </template>
-          新增图片
+          新增标签
         </a-button>
       </div>
     </div>
     <!-- 搜索表单 -->
-    <div class="picture-search">
+    <div class="tag-search">
       <a-form style="display: flex" :model="searchForm" autocomplete="off" @finish="handleSubmit">
         <a-space :size="20">
-          <!--  图片ID  -->
+          <!--  标签ID  -->
           <a-form-item>
             <a-input
-              style="min-width: 100px"
-              placeholder="请输入图片ID"
+              style="min-width: 120px"
+              placeholder="请输入标签ID"
               allow-clear
               v-model:value="searchForm.id"
             />
@@ -208,38 +210,11 @@ onMounted(() => {
           <!--  关键字  -->
           <a-form-item>
             <a-input
-              style="min-width: 100px"
+              style="min-width: 120px"
               placeholder="请输入关键字"
               allow-clear
               v-model:value="searchForm.text"
             />
-          </a-form-item>
-          <!--  分类  -->
-          <a-form-item>
-            <a-select
-              style="min-width: 120px"
-              placeholder="请选择分类"
-              allow-clear
-              v-model:value="searchForm.categoryId"
-            >
-              <a-select-option v-for="category in categoryList" :value="category.id">
-                {{ category.name }}
-              </a-select-option>
-            </a-select>
-          </a-form-item>
-          <!--  标签  -->
-          <a-form-item>
-            <a-select
-              style="min-width: 240px"
-              mode="multiple"
-              placeholder="请选择标签"
-              allow-clear
-              v-model:value="searchForm.tagIds"
-            >
-              <a-select-option v-for="tag in tagList" :value="tag.id">
-                <a-tag :color="tag.color">{{ tag.name }}</a-tag>
-              </a-select-option>
-            </a-select>
           </a-form-item>
           <!--  创建时间  -->
           <a-form-item>
@@ -267,7 +242,7 @@ onMounted(() => {
     </div>
 
     <!-- 数据列表 -->
-    <div class="picture-list">
+    <div class="tag-list">
       <a-table
         :columns="columns"
         :data-source="dataList"
@@ -277,26 +252,25 @@ onMounted(() => {
         :scroll="{ y: 400 }"
       >
         <template #bodyCell="{ column, record }">
-          <template v-if="column.dataIndex === 'id&name'">
+          <template v-if="column.dataIndex === 'id'">
             <a-space direction="vertical">
               <a-typography-text type="secondary">{{ record.id }}</a-typography-text>
-              <a-typography-text>{{ record.name }}</a-typography-text>
             </a-space>
           </template>
-          <template v-if="column.dataIndex === 'category&tag'">
-            <a-space direction="vertical">
-              <a-tag> {{ record.categoryDTO?.name ?? '-' }}</a-tag>
-              <a-tag :color="tag.color" v-for="tag in record.tagDTOList" :key="tag.id"> {{ tag.name }}</a-tag>
+          <template v-if="column.dataIndex === 'name'">
+            <a-typography-text>{{ record.name }}</a-typography-text>
+          </template>
+          <template v-if="column.dataIndex === 'color'">
+            <a-space>
+              <div :style="{ width: '20px', height: '20px', backgroundColor: record.color, borderRadius: '50%' }"></div>
+              <a-tag>{{ record.color }}</a-tag>
             </a-space>
           </template>
-          <template v-if="column.dataIndex === 'url'">
-            <a-image v-if="record.url" :src="record.url" />
+          <template v-if="column.dataIndex === 'description'">
+            <a-typography-text :ellipsis="true">{{ record.description }}</a-typography-text>
           </template>
-          <template v-if="column.dataIndex === 'nickname&createTime'">
-            <a-space direction="vertical">
-              <a-typography-text type="secondary">{{ record.userDTO?.nickname ?? '-' }}</a-typography-text>
-              <a-typography-text>{{ record.createTime }}</a-typography-text>
-            </a-space>
+          <template v-if="column.dataIndex === 'createTime'">
+            <span>{{ formatDate(record.createTime) }}</span>
           </template>
           <template v-if="column.key === 'action'">
             <a-space>
@@ -308,11 +282,17 @@ onMounted(() => {
         </template>
       </a-table>
     </div>
+    <TagHandleModal
+      v-model:visible="modalVisible"
+      :is-edit="isEdit"
+      :tag="currentTag"
+      @success="onSuccess"
+    />
   </div>
 </template>
 
 <style scoped>
-#picture-manager-page {
+#tag-manager-page {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -321,7 +301,7 @@ onMounted(() => {
   height: 100%;
 }
 
-.picture-manager-title {
+.tag-manager-title {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -329,13 +309,13 @@ onMounted(() => {
   margin-top: 20px;
 }
 
-.picture-search {
+.tag-search {
   margin-top: 20px;
   width: 90%;
   height: 80px;
 }
 
-.picture-list {
+.tag-list {
   width: 90%;
   height: 500px;
 }

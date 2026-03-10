@@ -4,8 +4,11 @@ export type * from './user'
 export * from './user'
 export type * from './picture'
 export * from './picture'
-export type * from './category.ts'
-export * from './category.ts'
+export type * from './category'
+export * from './category'
+export type * from './tag'
+export * from './tag'
+
 
 
 
