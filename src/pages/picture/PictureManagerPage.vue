@@ -337,15 +337,17 @@ onMounted(() => {
       >
         <template #bodyCell="{ column, record }">
           <template v-if="column.dataIndex === 'id&name'">
-            <a-space direction="vertical">
-              <a-typography-text type="secondary">{{ record.id }}</a-typography-text>
-              <a-typography-text>{{ record.name }}</a-typography-text>
-            </a-space>
+            <router-link :to="`/picture/detail/${record.id}`" target="_blank">
+              <a-space direction="vertical">
+                <a-typography-text type="secondary">{{ record.id }}</a-typography-text>
+                <a-typography-text>{{ record.name }}</a-typography-text>
+              </a-space>
+            </router-link>
           </template>
           <template v-if="column.dataIndex === 'category&tag'">
             <a-space direction="vertical">
-              <a-tag> {{ record.categoryDTO?.name ?? '暂无分类' }}</a-tag>
-              <a-tag :color="tag.color" v-for="tag in record.tagDTOList" :key="tag.id"> {{ tag.name }}</a-tag>
+              <a-tag :bordered="false"> {{ record.categoryDTO?.name ?? '暂无分类' }}</a-tag>
+              <a-tag :bordered="false" :color="tag.color" v-for="tag in record.tagDTOList" :key="tag.id"> {{ tag.name }}</a-tag>
             </a-space>
           </template>
           <template v-if="column.dataIndex === 'url'">

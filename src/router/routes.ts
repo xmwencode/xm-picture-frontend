@@ -45,6 +45,12 @@ export const routes = [
     }
   },
   {
+    path: '/picture/detail/:id',
+    name: 'PictureDetail',
+    component: () => import('@/pages/picture/PictureDetailPage.vue'),
+    props: true
+  },
+  {
     path: '/picture',
     name: 'PictureManagerBasic',
     component: () => import('@/pages/picture/PictureManagerBasicPage.vue'),
