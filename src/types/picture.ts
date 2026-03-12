@@ -4,6 +4,7 @@ export interface Picture {
   id: string
   name: string
   url: string
+  thumbnailUrl?: string
   introduction?: string
   createTime: string
   categoryId?: string
@@ -30,6 +31,7 @@ export interface PictureVO {
   id: string
   name: string
   url: string
+  thumbnailUrl?: string
   introduction?: string
   createTime: string
   categoryId?: string

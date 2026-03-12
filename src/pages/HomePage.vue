@@ -136,16 +136,16 @@ onMounted(() => {
       :loading="loading"
     >
       <template #renderItem="{ item: picture }">
-        <a-list-item>
+        <a-list-item @click="handleClickPicture(picture)" >
           <a-card hoverable>
             <template #cover>
-              <a-image
+              <img
                 style="height: 180px; object-fit: cover"
-                :src="picture.url"
+                :src="picture.thumbnailUrl ?? picture.url"
                 :alt="picture.name"
               />
             </template>
-            <a-card-meta @click="handleClickPicture(picture)" :title="picture.name">
+            <a-card-meta :title="picture.name">
               <template #description>
                 <a-flex>
                   <a-tag :bordered="false">{{ picture.categoryName ?? '默认' }}</a-tag>
