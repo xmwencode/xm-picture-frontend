@@ -1,10 +1,19 @@
 <script setup lang="ts">
+
+import type { Category, PictureQueryRequest, SpaceVO, Tag } from '@/types'
 import { computed, onMounted, reactive, ref } from 'vue'
-import type { Category, PictureQueryRequest, Tag } from '@/types'
+import { getSpaceVOByIdApi } from '@/api/space.ts'
 import { getCategoryListApi, getTagListApi, listPictureVOByPageApi } from '@/api'
 import PictureList from '@/components/PictureList.vue'
+import { formatSize } from '@/utils/MemoryUtils.ts'
+
+const props = defineProps<{
+  id: string
+}>()
+
 
 // 数据
+const space = ref<SpaceVO>()
 const dataList = ref([])
 const total = ref(0)
 const loading = ref(true)
@@ -21,13 +30,23 @@ const searchForm = reactive<PictureQueryRequest>({
   sortOrder: 'descend',
 })
 
+// 获取数据
+const fetchSpaceDetail = async () => {
+  const res = await getSpaceVOByIdApi(props.id)
+  if (res.data) {
+    space.value = res.data
+  } else {
+    console.log('获取空间详情失败')
+  }
+}
+
 // 分页参数
 const pagination = computed(() => {
   return {
     current: searchForm.current ?? 1,
     pageSize: searchForm.pageSize ?? 12,
     total: total.value,
-    showTotal: (total: number) => `共 ${total} 条`,
+    showTotal: (total: number) => `图片总数 ${total} / ${space.value?.maxCount}`,
   }
 })
 
@@ -41,6 +60,7 @@ const handleSearch = () => {
 // 获取数据
 const fetchData = async () => {
   loading.value = true
+  searchForm.spaceId = props.id
 
   searchForm.categoryId = selectedCategoryId.value === 'all' ? undefined : selectedCategoryId.value
   const selectedTagIds: string[] = []
@@ -62,14 +82,6 @@ const fetchData = async () => {
   }
 }
 
-// 处理表单改变
-const handleTableChange = (current: number, pageSize: number) => {
-  searchForm.current = current
-  searchForm.pageSize = pageSize
-
-  fetchData()
-}
-
 // 获取分类
 const fetchCategoryList = async () => {
   const res = await getCategoryListApi()
@@ -87,47 +99,41 @@ const fetchTagList = async () => {
 }
 
 onMounted(() => {
+  fetchSpaceDetail()
   fetchCategoryList()
   fetchTagList()
   fetchData()
 })
+
 </script>
 
 <template>
-  <div id="home-page">
-    <!-- 顶部搜索栏 -->
-    <div class="picture-search">
-      <a-input-search
-        v-model:value="searchForm.text"
-        placeholder="从海量图片中搜索"
-        enter-button
-        @search="fetchData"
-        allow-clear
-      />
-    </div>
-    <!-- 分类搜索 -->
-    <a-tabs v-model:activeKey="selectedCategoryId" @change="handleSearch">
-      <a-tab-pane key="all" tab="全部" />
-      <a-tab-pane v-for="category in categoryList" :key="category.id" :tab="category.name" />
-    </a-tabs>
-    <!-- 标签搜索 -->
-    <div class="tag-bar" v-show="false">
-      <span style="margin-right: 8px">标签：</span>
-      <a-space :size="[0, 8]" wrap>
-        <a-checkable-tag
-          v-for="(tag, index) in tagList"
-          :key="tag.id"
-          v-model:checked="isSelectedTagList[index]"
-          @change="handleSearch"
+  <div id="space-detail-page">
+    <!-- 空间信息 -->
+    <a-flex justify="space-between" style="margin-bottom: 20px">
+      <a-typography-title :level="4"> {{ space?.spaceName }} （私有空间）</a-typography-title>
+      <a-space size="middle">
+        <a-button type="primary" :href="`/picture/add?spaceId=${id}`">
+          + 创建图片
+        </a-button>
+        <a-tooltip
+          :title="`占用空间 ${formatSize(space?.totalSize)} / ${formatSize(space?.maxSize)}`"
         >
-          {{ tag.name }}
-        </a-checkable-tag>
+          <a-progress
+            type="circle"
+            :percent="(((space?.totalSize ?? 0) * 100) / (space?.maxSize ?? 0)).toFixed(1)"
+            :size="42"
+          />
+        </a-tooltip>
       </a-space>
-    </div>
+    </a-flex>
+
     <!-- 图片列表 -->
     <picture-list
       :dataList="dataList"
       :loading="loading"
+      :on-success="fetchData"
+      :show-options="true"
     />
     <!-- 分页 -->
     <a-flex justify="center">
@@ -144,21 +150,5 @@ onMounted(() => {
 </template>
 
 <style scoped>
-#home-page {
-  margin: 0 auto;
-  width: 90%;
-  height: 100%;
-}
-
-.picture-search {
-  max-width: 480px;
-  margin: 16px auto 8px;
-}
-
-.tag-bar {
-  margin: 8px auto 16px;
-}
-
-
 
 </style>

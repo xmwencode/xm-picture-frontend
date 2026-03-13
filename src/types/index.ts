@@ -8,6 +8,8 @@ export type * from './category'
 export * from './category'
 export type * from './tag'
 export * from './tag'
+export type * from './space'
+export * from './space'
 
 
 

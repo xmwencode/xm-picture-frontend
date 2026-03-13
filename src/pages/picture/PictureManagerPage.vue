@@ -52,7 +52,7 @@ const handleDelete = (record: any) => {
       })
       if (res.data) {
         message.success('删除成功')
-        await freshData()
+        await fetchData()
       }
     },
     onCancel: () => {
@@ -88,7 +88,7 @@ const handleReview = async (record: any, status: number) => {
       })
       if (res.data) {
         message.success('审核操作成功')
-        await freshData()
+        await fetchData()
       } else {
         message.error('审核操作失败')
       }
@@ -147,11 +147,11 @@ const pagination = computed(() => {
 
 // 提交表单
 const handleSubmit = () => {
-  freshData()
+  fetchData()
 }
 
 // 获取数据
-const freshData = async () => {
+const fetchData = async () => {
   loading.value = true
   try {
     const res = await listPictureByPageApi(searchForm)
@@ -168,7 +168,7 @@ const freshData = async () => {
 const handleTableChange = (page: any, filters: any) => {
   searchForm.current = page.current
   searchForm.pageSize = page.pageSize
-  freshData()
+  fetchData()
 }
 
 /**
@@ -215,7 +215,7 @@ const fetchTagList = async () => {
 onMounted(() => {
   fetchCategoryList()
   fetchTagList()
-  freshData()
+  fetchData()
 })
 </script>
 

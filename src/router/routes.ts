@@ -76,4 +76,43 @@ export const routes = [
       },
     ],
   },
+  {
+    path: '/space/manager',
+    name: 'SpaceManager',
+    component: () => import('@/pages/space/SpaceManagerPage.vue'),
+    meta: {
+      access: [UserRoleEnum.ADMIN]
+    }
+  },
+  {
+    path: '/space/add',
+    name: 'AddSpace',
+    component: () => import('@/pages/space/SpaceHandlePage.vue'),
+    meta: {
+      access: [UserRoleEnum.ADMIN, UserRoleEnum.USER]
+    }
+  },
+  {
+    path: '/space',
+    name: 'SpaceBasic',
+    component: () => import('@/pages/space/SpaceBasicPage.vue'),
+    meta: {
+      access: [UserRoleEnum.ADMIN, UserRoleEnum.USER]
+    },
+    redirect: '/space/private',
+    children: [
+      {
+        path: '/space/private',
+        name: 'PrivateSpace',
+        component: () => import('@/pages/space/PrivateSpacePage.vue'),
+      },
+      {
+        path: '/space/detail/:id',
+        name: 'SpaceDetail',
+        component: () => import('@/pages/space/SpaceDetailPage.vue'),
+        props: true
+      }
+    ]
+  },
+
 ]

@@ -19,8 +19,9 @@ const formData = reactive<PictureEditRequest>({
 })
 const uploadType = ref<'file' | 'url'>('file')
 const pictureId = computed(() => {
-  return route.query?.id as string ?? ''
+  return route.query?.id as string
 })
+const spaceId = computed(() => route.query?.spaceId as string)
 
 const categoryList = ref<Category[]>([])
 const tagList = ref<Tag[]>([])
@@ -38,6 +39,7 @@ const handleSuccess = (data: PictureVO) => {
 // 提交表单
 const handleSubmit = async () => {
   try {
+    formData.spaceId = spaceId.value
     const res = await editPictureApi(formData)
     if (res.data) {
       message.success('修改成功')
@@ -96,16 +98,19 @@ onMounted(() => {
     <!-- 标题栏 -->
     <div class="picture-handle-title">
       <a-typography-title :level="3">{{ pictureId ? '修改图片' : '创建图片' }}</a-typography-title>
+      <a-typography-paragraph v-if="spaceId" type="secondary">
+        保存至空间：<a :href="`/space/${spaceId}`" target="_blank">{{ spaceId }}</a>
+      </a-typography-paragraph>
     </div>
     <!-- 图片上传栏 -->
     <div class="picture-upload">
       <!-- 选择上传方式 -->
       <a-tabs v-model:activeKey="uploadType">
         <a-tab-pane key="file" tab="文件上传">
-          <PictureUpload :picture="picture" :onSuccess="handleSuccess" />
+          <PictureUpload :spaceId="spaceId" :picture="picture" :onSuccess="handleSuccess" />
         </a-tab-pane>
         <a-tab-pane key="url" tab="URL 上传" force-render>
-          <UrlPictureUpload :picture="picture" :onSuccess="handleSuccess" />
+          <UrlPictureUpload :spaceId="spaceId" :picture="picture" :onSuccess="handleSuccess" />
         </a-tab-pane>
       </a-tabs>
     </div>

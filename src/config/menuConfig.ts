@@ -3,7 +3,7 @@ import {
   AppstoreAddOutlined,
   HomeOutlined,
   LikeOutlined, PictureOutlined,
-  UserOutlined
+  UserOutlined, AppstoreOutlined, WindowsOutlined, VideoCameraAddOutlined
 } from '@ant-design/icons-vue'
 import { h } from 'vue'
 import type { RouteRecordRaw } from 'vue-router'
@@ -29,10 +29,16 @@ export const menuItems: MenuConfig[] = [
     icon: () => h(HomeOutlined),
   },
   {
+    name: 'SpaceBasic',
+    label: '我的空间',
+    title: '我的空间',
+    icon: () => h(WindowsOutlined),
+  },
+  {
     name: 'AddPicture',
     label: '新建图片',
     title: '新建图片',
-    icon: () => h(AppstoreAddOutlined),
+    icon: () => h(VideoCameraAddOutlined),
   },
   {
     name: 'UserManager',
@@ -45,6 +51,12 @@ export const menuItems: MenuConfig[] = [
     label: '图片管理',
     title: '图片管理',
     icon: () => h(PictureOutlined),
+  },
+  {
+    name: 'SpaceManager',
+    label: '空间管理',
+    title: '空间管理',
+    icon: () => h(AppstoreOutlined),
   },
   {
     name: 'About',

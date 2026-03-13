@@ -7,14 +7,15 @@ import { message } from 'ant-design-vue'
 interface Props {
   picture?: PictureVO
   onSuccess?: (picture: PictureVO) => void
+  spaceId?: string
 }
 
 const loading = ref(false)
 const fileUrl = ref('')
 const props = withDefaults(defineProps<Props>(), {
   picture: undefined,
+  spaceId: '',
 })
-
 
 /**
  * 上传图片
@@ -24,6 +25,8 @@ const handleUpload = async () => {
   if (!fileUrl.value) return
   try {
     const res = await uploadPictureByUrlApi({
+      id: props.picture?.id ?? '',
+      spaceId: props.spaceId ?? '',
       url: fileUrl.value,
     })
     if (res.data) {
@@ -40,7 +43,6 @@ const handleUpload = async () => {
     loading.value = false
   }
 }
-
 </script>
 
 <template>

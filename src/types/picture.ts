@@ -16,6 +16,7 @@ export interface Picture {
   picFormat?: string
   userId?: string
   userDTO?: User
+  spaceId?: string
   reviewStatus?: number
   reviewMessage?: string
   reviewUserId?: string
@@ -25,6 +26,7 @@ export interface Picture {
 export interface PictureUploadRequest {
   id?: string
   url?: string
+  spaceId?: string
 }
 
 export interface PictureVO {
@@ -44,10 +46,12 @@ export interface PictureVO {
   picFormat?: string
   userId?: string
   userNickname?: string
+  spaceId?: string
 }
 
 export interface PictureUpdateRequest {
   id: string
+  spaceId?: string
   name?: string
   url?: string
   introduction?: string
@@ -57,6 +61,7 @@ export interface PictureUpdateRequest {
 
 export interface PictureEditRequest {
   id: string
+  spaceId?: string
   name?: string
   url?: string
   introduction?: string
@@ -71,6 +76,7 @@ export interface PictureQueryRequest extends PageParams {
   categoryId?: string
   tagIds?: string[]
   userId?: string
+  spaceId?: string
   startTime?: string
   endTime?: string
   picSize?: number

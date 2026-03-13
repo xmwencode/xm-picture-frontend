@@ -1,7 +1,7 @@
 import request from '@/api/requet.ts'
 import type {
   ApiResponse,
-  DeleteRequest,
+  DeleteRequest, PictureEditRequest,
   PictureQueryRequest,
   PictureReviewRequest,
   PictureUploadRequest,
@@ -23,12 +23,11 @@ export const uploadPictureApi = (
   formData.append('file', file)
   // 添加 PictureUploadRequest 参数
   if (params) {
-    if (params.id) {
-      formData.append('id', params.id)
-    }
-    if (params.url) {
-      formData.append('url', params.url)
-    }
+    Object.entries(params).forEach(([key, value]) => {
+      if (value !== undefined && value !== null && value !== '') {
+        formData.append(key, value)
+      }
+    })
   }
 
   return request.post('/picture/upload', formData, {
@@ -46,7 +45,7 @@ export const updatePictureApi = (data: PictureUploadRequest) => {
   return request.post('/picture/update', data)
 }
 
-export const editPictureApi = (data: PictureUploadRequest) => {
+export const editPictureApi = (data: PictureEditRequest) => {
   return request.post('/picture/edit', data)
 }
 

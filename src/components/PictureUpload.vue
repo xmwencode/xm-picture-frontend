@@ -1,6 +1,6 @@
 <script setup lang="ts">
 
-import type { PictureVO } from '@/types'
+import type { PictureUploadRequest, PictureVO } from '@/types'
 import { message } from 'ant-design-vue'
 import { uploadPictureApi } from '@/api'
 import { ref } from 'vue'
@@ -8,11 +8,13 @@ import { ref } from 'vue'
 interface Props {
   picture?: PictureVO
   onSuccess?: (picture: PictureVO) => void
+  spaceId?: string
 }
 
 const loading = ref(false)
 const props = withDefaults(defineProps<Props>(), {
-  picture: undefined
+  picture: undefined,
+  spaceId: ''
 })
 
 
@@ -38,11 +40,12 @@ const beforeUpload = (file: File) => {
  */
 const handleUpload = async ({ file }: { file: File }) => {
   loading.value = true
-
   try {
-    const params = props.picture ? { id: props.picture.id } : {};
+    const params = {
+      id: props.picture?.id ?? '',
+      spaceId: props.spaceId ?? '',
+    } as PictureUploadRequest;
     const res = await uploadPictureApi(file, params)
-
     if (res.data) {
       message.success('图片上传成功')
       // 将上传成功的图片信息返回给父组件
