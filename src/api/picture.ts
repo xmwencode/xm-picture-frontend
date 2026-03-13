@@ -3,7 +3,7 @@ import type {
   ApiResponse,
   DeleteRequest, PictureEditRequest,
   PictureQueryRequest,
-  PictureReviewRequest,
+  PictureReviewRequest, PictureUploadByBatchRequest,
   PictureUploadRequest,
   PictureVO
 } from '@/types'
@@ -71,4 +71,8 @@ export const getPictureVOByIdApi = (id: string) => {
 
 export const reviewPictureApi = (data: PictureReviewRequest) => {
   return request.post('/picture/review', data)
+}
+
+export const uploadPictureByBatchApi = (data: PictureUploadByBatchRequest) => {
+  return request.post('/picture/upload/batch', data)
 }

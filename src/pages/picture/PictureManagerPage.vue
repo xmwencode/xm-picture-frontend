@@ -14,6 +14,8 @@ type RangeValue = [Dayjs, Dayjs]
 const searchForm = reactive<PictureQueryRequest>({
   current: 1,
   pageSize: 5,
+  sortField: 'create_time',
+  sortOrder: 'desc',
 })
 
 const dataRange = ref<RangeValue>()
@@ -225,12 +227,15 @@ onMounted(() => {
     <div class="picture-manager-title">
       <a-typography-title :level="3">图片管理</a-typography-title>
       <div class="picture-manager-options">
-        <a-button @click="handleAdd" type="primary">
-          <template #icon>
-            <PlusCircleOutlined />
-          </template>
-          新增图片
-        </a-button>
+        <a-space>
+          <a-button @click="handleAdd" type="primary">
+            <template #icon>
+              <PlusCircleOutlined />
+            </template>
+            新增图片
+          </a-button>
+          <a-button type="primary" href="/picture/batch/add" ghost>+ 批量创建图片</a-button>
+        </a-space>
       </div>
     </div>
 

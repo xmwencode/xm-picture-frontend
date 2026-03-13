@@ -94,3 +94,10 @@ export interface PictureReviewRequest {
   reviewStatus: number
   reviewMessage?: string
 }
+
+export interface PictureUploadByBatchRequest {
+  searchText?: string
+  count?: number
+  spaceId?: string
+  namePrefix?: string
+}

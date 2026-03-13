@@ -98,7 +98,7 @@ onMounted(() => {
     <div class="picture-handle-title">
       <a-typography-title :level="3">{{ pictureId ? '修改图片' : '创建图片' }}</a-typography-title>
       <a-typography-paragraph v-if="spaceId" type="secondary">
-        保存至空间：<a :href="`/space/${spaceId}`" target="_blank">{{ spaceId }}</a>
+        保存至空间：<a :href="`/space/detail/${spaceId}`" target="_blank">{{ spaceId }}</a>
       </a-typography-paragraph>
     </div>
     <!-- 图片上传栏 -->

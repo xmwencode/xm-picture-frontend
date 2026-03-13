@@ -87,6 +87,7 @@ onMounted(() => {
         <a-button type="primary" :href="`/picture/add?spaceId=${id}`">
           + 创建图片
         </a-button>
+        <a-button type="primary" :href="`/picture/batch/add?spaceId=${id}`" ghost>+ 批量创建图片</a-button>
         <a-tooltip
           :title="`占用空间 ${formatSize(space?.totalSize)} / ${formatSize(space?.maxSize)}`"
         >

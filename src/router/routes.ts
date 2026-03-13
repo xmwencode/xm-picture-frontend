@@ -74,6 +74,11 @@ export const routes = [
         name: 'TagManager',
         component: () => import('@/pages/picture/TagManagerPage.vue'),
       },
+      {
+        path: '/picture/batch/add',
+        name: 'PictureBatchAdd',
+        component: () => import('@/pages/picture/PictureBatchAddPage.vue'),
+      }
     ],
   },
   {
