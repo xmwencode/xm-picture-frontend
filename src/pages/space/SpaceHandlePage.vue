@@ -54,7 +54,6 @@ const handleSubmit = async () => {
   } else {
     // 创建空间
     try {
-      console.log('formData', formData)
       const res = await addSpaceApi(formData as SpaceAddRequest)
       if (res.data) {
         message.success('创建成功')

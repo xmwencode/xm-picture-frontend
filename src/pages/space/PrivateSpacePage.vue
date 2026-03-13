@@ -26,7 +26,6 @@ const checkUserSpace = async () => {
   if (res.data) {
     if (res.data?.records?.length > 0) {
       const spaceId = res.data.records[0].id
-      console.log(spaceId)
       await router.replace(`/space/detail/${spaceId}`)
     } else {
       await router.replace('/space/add')

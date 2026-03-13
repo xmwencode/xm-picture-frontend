@@ -41,7 +41,6 @@ router.beforeEach(async (to, from) => {
   if (checkAccess(userStore.loginUser, needAccess)) {
     return true
   } else {
-    console.log(userStore.loginUser)
     message.error('无权限访问')
     return {
       path: from.path,

@@ -79,7 +79,7 @@ const handleDelete = (record: any, e: any) => {
       :loading="loading"
     >
       <template #renderItem="{ item: picture }">
-        <a-list-item @click="handleClickPicture(picture)" >
+        <a-list-item style="padding: 0 10px" @click="handleClickPicture(picture)" >
           <a-card hoverable>
             <template #cover>
               <img

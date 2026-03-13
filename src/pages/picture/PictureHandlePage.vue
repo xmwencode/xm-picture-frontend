@@ -57,7 +57,6 @@ const handleSubmit = async () => {
 const fetchPicture = async () => {
   if (!pictureId.value) return
   const res = await getPictureByIdApi(pictureId.value)
-  console.log(res.data)
   if (res.data) {
     picture.value = res.data
     formData.id = res.data.id

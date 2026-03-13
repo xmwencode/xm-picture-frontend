@@ -70,7 +70,6 @@ const handleOk = async () => {
     await formRef.value?.validate()
 
     confirmLoading.value = true
-    console.log(formState.value)
 
     // 根据模式调用不同接口
     if (props.isEdit) {

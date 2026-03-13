@@ -20,7 +20,6 @@ const handleSubmit = async () => {
     const res = await userLoginApi(formData)
     userStore.setToken(res.data?.token ?? '')
     userStore.setUserInfo(res.data?.userDTO ?? userStore.loginUser)
-    console.log(res)
     message.success('登录成功')
     await router.push('/')
   } catch (e) {

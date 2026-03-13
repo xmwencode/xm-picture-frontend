@@ -6,6 +6,8 @@ import { getSpaceVOByIdApi } from '@/api/space.ts'
 import { getCategoryListApi, getTagListApi, listPictureVOByPageApi } from '@/api'
 import PictureList from '@/components/PictureList.vue'
 import { formatSize } from '@/utils/MemoryUtils.ts'
+import PictureSearchForm from '@/components/PictureSearchForm.vue'
+import { message } from 'ant-design-vue'
 
 const props = defineProps<{
   id: string
@@ -17,10 +19,6 @@ const space = ref<SpaceVO>()
 const dataList = ref([])
 const total = ref(0)
 const loading = ref(true)
-const categoryList = ref<Category[]>([])
-const tagList = ref<Tag[]>([])
-const selectedCategoryId = ref<string>('all')
-const isSelectedTagList = ref<boolean[]>([])
 
 // 搜索条件
 const searchForm = reactive<PictureQueryRequest>({
@@ -36,7 +34,7 @@ const fetchSpaceDetail = async () => {
   if (res.data) {
     space.value = res.data
   } else {
-    console.log('获取空间详情失败')
+    message.error('获取空间详情失败')
   }
 }
 
@@ -51,7 +49,8 @@ const pagination = computed(() => {
 })
 
 // 搜索
-const handleSearch = () => {
+const handleSearch = (newSearchForm: PictureQueryRequest) => {
+  Object.assign(searchForm, newSearchForm)
   searchForm.current = 1
   searchForm.pageSize = 12
   fetchData()
@@ -61,16 +60,6 @@ const handleSearch = () => {
 const fetchData = async () => {
   loading.value = true
   searchForm.spaceId = props.id
-
-  searchForm.categoryId = selectedCategoryId.value === 'all' ? undefined : selectedCategoryId.value
-  const selectedTagIds: string[] = []
-  isSelectedTagList.value.forEach((isSelected, index) => {
-    if (isSelected && tagList.value[index]) {
-      selectedTagIds.push(tagList.value[index].id)
-    }
-  })
-  searchForm.tagIds = selectedTagIds.length > 0 ? selectedTagIds : undefined
-
   try {
     const res = await listPictureVOByPageApi(searchForm)
     if (res.data) {
@@ -82,26 +71,8 @@ const fetchData = async () => {
   }
 }
 
-// 获取分类
-const fetchCategoryList = async () => {
-  const res = await getCategoryListApi()
-  if (res.data) {
-    categoryList.value = res.data
-  }
-}
-
-// 获取标签
-const fetchTagList = async () => {
-  const res = await getTagListApi()
-  if (res.data) {
-    tagList.value = res.data
-  }
-}
-
 onMounted(() => {
   fetchSpaceDetail()
-  fetchCategoryList()
-  fetchTagList()
   fetchData()
 })
 
@@ -127,6 +98,13 @@ onMounted(() => {
         </a-tooltip>
       </a-space>
     </a-flex>
+
+    <!-- 搜索栏 -->
+    <PictureSearchForm
+      :on-search="handleSearch"
+    />
+
+    <div style="margin-top: 24px" />
 
     <!-- 图片列表 -->
     <picture-list
