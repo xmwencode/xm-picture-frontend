@@ -101,3 +101,12 @@ export interface PictureUploadByBatchRequest {
   spaceId?: string
   namePrefix?: string
 }
+
+export interface ImageSearchResult {
+  thumbUrl?: string
+  fromUrl?: string
+}
+
+export interface SearchPictureByPictureRequest {
+  pictureId: string
+}

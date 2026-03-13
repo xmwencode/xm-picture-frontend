@@ -43,7 +43,7 @@ const handleEdit = (picture: any, e: any) => {
 }
 
 // 删除
-const handleDelete = (record: any, e: any) => {
+const handleDelete = (picture: any, e: any) => {
   // 阻止事件冒泡
   e.stopPropagation()
   Modal.confirm({
@@ -55,7 +55,7 @@ const handleDelete = (record: any, e: any) => {
     cancelText: '取消',
     onOk: async () => {
       const res = await deletePictureApi({
-        id: record.id,
+        id: picture.id,
       })
       if (res.data) {
         message.success('删除成功')
@@ -66,6 +66,13 @@ const handleDelete = (record: any, e: any) => {
       return
     },
   })
+}
+
+// 以图搜图
+const handleSearch = (picture: any, e: any) => {
+  // 阻止事件冒泡
+  e.stopPropagation()
+  window.open(`/picture/search?pictureId=${picture.id}`)
 }
 
 </script>
@@ -99,6 +106,10 @@ const handleDelete = (record: any, e: any) => {
               </template>
             </a-card-meta>
             <template #actions v-if="showOptions">
+              <a-space @click="handleSearch(picture, $event)">
+                <search-outlined />
+                搜索
+              </a-space>
               <a-space @click="handleEdit(picture, $event)">
                 <edit-outlined />
                 编辑

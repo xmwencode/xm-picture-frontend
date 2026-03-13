@@ -82,6 +82,11 @@ export const routes = [
     ],
   },
   {
+    path: '/picture/search',
+    name: 'PictureSearch',
+    component: () => import('@/pages/picture/PictureSearchPage.vue'),
+  },
+  {
     path: '/space/manager',
     name: 'SpaceManager',
     component: () => import('@/pages/space/SpaceManagerPage.vue'),
