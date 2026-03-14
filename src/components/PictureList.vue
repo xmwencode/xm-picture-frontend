@@ -30,9 +30,7 @@ const props = withDefaults(defineProps<Props>(), {
 // 跳转到图片详情
 const router = useRouter()
 const handleClickPicture = (picture: PictureVO) => {
-  router.push({
-    path: `/picture/detail/${picture.id}`,
-  })
+  window.open(`/picture/detail/${picture.id}`)
 }
 
 // 分享弹窗引用

@@ -1,11 +1,13 @@
 <script setup lang="ts">
 import PictureUpload from '@/components/PictureUpload.vue'
-import { computed, onMounted, reactive, ref } from 'vue'
+import { computed, h, onMounted, reactive, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import type { Category, PictureEditRequest, PictureVO, Tag } from '@/types'
 import { editPictureApi, getCategoryListApi, getPictureByIdApi, getTagListApi } from '@/api'
 import { message } from 'ant-design-vue'
 import UrlPictureUpload from '@/components/UrlPictureUpload.vue'
+import ImageCropperModal from '@/components/ImageCropperModal.vue'
+import { EditOutlined } from '@ant-design/icons-vue'
 
 const route = useRoute()
 const picture = ref<PictureVO>()
@@ -25,6 +27,7 @@ const spaceId = computed(() => route.query?.spaceId as string)
 
 const categoryList = ref<Category[]>([])
 const tagList = ref<Tag[]>([])
+const imageCropperModal = ref()
 
 const handleSuccess = (data: PictureVO) => {
   picture.value = data
@@ -34,6 +37,10 @@ const handleSuccess = (data: PictureVO) => {
   formData.categoryId = data.categoryId
   formData.url = data.url
   formData.tagIds = data.tagDTOList?.map((tag) => tag.id) ?? []
+}
+
+const onCropSuccess = (newPicture: PictureVO) => {
+  picture.value = newPicture
 }
 
 // 提交表单
@@ -89,7 +96,6 @@ onMounted(() => {
   fetchCategoryList()
   fetchTagList()
 })
-
 </script>
 
 <template>
@@ -113,6 +119,22 @@ onMounted(() => {
         </a-tab-pane>
       </a-tabs>
     </div>
+    <!-- 图片编辑弹窗 -->
+    <a-button
+      style="margin-top: 20px; width: 200px"
+      type="default"
+      @click="imageCropperModal.openModal()"
+      :icon="h(EditOutlined)"
+    >
+      编辑图片
+    </a-button>
+    <ImageCropperModal
+      ref="imageCropperModal"
+      :picture="picture"
+      :imageUrl="picture?.url"
+      :spaceId="spaceId"
+      :onSuccess="onCropSuccess"
+    />
     <!-- 表单栏 -->
     <div class="picture-handle-form">
       <a-form
@@ -133,7 +155,11 @@ onMounted(() => {
         <!-- 图片分类 -->
         <a-form-item label="图片分类" name="categoryId">
           <a-select v-model:value="formData.categoryId" placeholder="请选择图片分类" allow-clear>
-            <a-select-option v-for="category in categoryList" :key="category.id" :value="category.id">
+            <a-select-option
+              v-for="category in categoryList"
+              :key="category.id"
+              :value="category.id"
+            >
               {{ category.name }}
             </a-select-option>
           </a-select>
@@ -154,7 +180,7 @@ onMounted(() => {
         </a-form-item>
         <!-- 确认按钮 -->
         <a-form-item>
-          <a-button style="width: 100%" type="default" html-type="submit"> 确认 </a-button>
+          <a-button style="width: 100%" type="default" html-type="submit"> 确认</a-button>
         </a-form-item>
       </a-form>
     </div>

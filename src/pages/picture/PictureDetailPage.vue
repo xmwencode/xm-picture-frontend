@@ -4,6 +4,7 @@ import type { PictureVO } from '@/types'
 import { onMounted, ref } from 'vue'
 import { message } from 'ant-design-vue'
 import { formatSize } from '@/utils/MemoryUtils.ts'
+import { downloadImage } from '@/utils/ImageDownloadUtils.ts'
 
 const picture = ref<PictureVO>({} as PictureVO)
 
@@ -80,6 +81,14 @@ onMounted(() => {
             </a-descriptions-item>
           </a-descriptions>
         </a-card>
+        <a-space style="margin-top: 20px" wrap>
+          <a-button type="primary" @click="downloadImage(picture.url)">
+            免费下载
+            <template #icon>
+              <DownloadOutlined />
+            </template>
+          </a-button>
+        </a-space>
       </a-col>
     </a-row>
   </div>
