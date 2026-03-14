@@ -110,3 +110,11 @@ export interface ImageSearchResult {
 export interface SearchPictureByPictureRequest {
   pictureId: string
 }
+
+export interface PictureBatchEditRequest {
+  pictureIds: string[]
+  nameRule?: string
+  spaceId?: string
+  categoryId?: string
+  tagIds?: string[]
+}

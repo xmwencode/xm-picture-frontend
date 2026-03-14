@@ -1,24 +1,25 @@
 <script setup lang="ts">
-
 import type { Category, PictureQueryRequest, SpaceVO, Tag } from '@/types'
-import { computed, onMounted, reactive, ref } from 'vue'
+import { computed, h, onMounted, reactive, ref } from 'vue'
 import { getSpaceVOByIdApi } from '@/api/space.ts'
 import { getCategoryListApi, getTagListApi, listPictureVOByPageApi } from '@/api'
 import PictureList from '@/components/PictureList.vue'
 import { formatSize } from '@/utils/MemoryUtils.ts'
 import PictureSearchForm from '@/components/PictureSearchForm.vue'
 import { message } from 'ant-design-vue'
+import PictureBatchEditModal from '@/components/PictureBatchEditModal.vue'
+import { EditOutlined } from '@ant-design/icons-vue'
 
 const props = defineProps<{
   id: string
 }>()
-
 
 // 数据
 const space = ref<SpaceVO>()
 const dataList = ref([])
 const total = ref(0)
 const loading = ref(true)
+const pictureBatchEditModalRef = ref()
 
 // 搜索条件
 const searchForm = reactive<PictureQueryRequest>({
@@ -71,11 +72,16 @@ const fetchData = async () => {
   }
 }
 
+const handleBatchEdit = () => {
+  if (pictureBatchEditModalRef.value) {
+    pictureBatchEditModalRef.value.openModal()
+  }
+}
+
 onMounted(() => {
   fetchSpaceDetail()
   fetchData()
 })
-
 </script>
 
 <template>
@@ -84,16 +90,17 @@ onMounted(() => {
     <a-flex justify="space-between" style="margin-bottom: 20px">
       <a-typography-title :level="4"> {{ space?.spaceName }} （私有空间）</a-typography-title>
       <a-space size="middle">
-        <a-button type="primary" :href="`/picture/add?spaceId=${id}`">
-          + 创建图片
+        <a-button type="primary" :href="`/picture/add?spaceId=${id}`"> + 创建图片</a-button>
+        <a-button type="primary" :href="`/picture/batch/add?spaceId=${id}`" ghost>
+          + 批量创建图片
         </a-button>
-        <a-button type="primary" :href="`/picture/batch/add?spaceId=${id}`" ghost>+ 批量创建图片</a-button>
+        <a-button :icon="h(EditOutlined)" @click="handleBatchEdit"> 批量编辑</a-button>
         <a-tooltip
           :title="`占用空间 ${formatSize(space?.totalSize)} / ${formatSize(space?.maxSize)}`"
         >
           <a-progress
             type="circle"
-            :percent="(((space?.totalSize ?? 0) * 100) / (space?.maxSize ?? 0)).toFixed(1)"
+            :percent="((Number(space?.totalSize) * 100) / (Number(space?.maxSize))).toFixed(1)"
             :size="42"
           />
         </a-tooltip>
@@ -101,9 +108,7 @@ onMounted(() => {
     </a-flex>
 
     <!-- 搜索栏 -->
-    <PictureSearchForm
-      :on-search="handleSearch"
-    />
+    <PictureSearchForm :on-search="handleSearch" />
 
     <div style="margin-top: 24px" />
 
@@ -117,7 +122,7 @@ onMounted(() => {
     <!-- 分页 -->
     <a-flex justify="center">
       <a-pagination
-        :total="total"
+        :total="Number(total)"
         v-model:current="searchForm.current"
         v-model:page-size="searchForm.pageSize"
         :show-total="pagination.showTotal"
@@ -125,9 +130,14 @@ onMounted(() => {
         :hideOnSinglePage="true"
       />
     </a-flex>
+
+    <PictureBatchEditModal
+      ref="pictureBatchEditModalRef"
+      :spaceId="id"
+      :pictureList="dataList"
+      :onSuccess="fetchData"
+    />
   </div>
 </template>
 
-<style scoped>
-
-</style>
+<style scoped></style>

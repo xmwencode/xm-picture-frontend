@@ -1,12 +1,18 @@
 <script setup lang="ts">
-
 // 数据
 import type { PictureVO } from '@/types'
 import { useRouter } from 'vue-router'
 import { message, Modal } from 'ant-design-vue'
-import { createVNode } from 'vue'
-import { ExclamationCircleOutlined } from '@ant-design/icons-vue'
+import { createVNode, ref } from 'vue'
+import {
+  ExclamationCircleOutlined,
+  SearchOutlined,
+  ShareAltOutlined,
+  EditOutlined,
+  DeleteOutlined,
+} from '@ant-design/icons-vue'
 import { deletePictureApi } from '@/api'
+import PictureShareModal from '@/components/PictureShareModal.vue'
 
 interface Props {
   dataList?: PictureVO[]
@@ -18,16 +24,21 @@ interface Props {
 const props = withDefaults(defineProps<Props>(), {
   dataList: () => [],
   loading: () => false,
-  showOptions: () => false
+  showOptions: () => false,
 })
 
 // 跳转到图片详情
 const router = useRouter()
 const handleClickPicture = (picture: PictureVO) => {
   router.push({
-    path: `/picture/detail/${picture.id}`
+    path: `/picture/detail/${picture.id}`,
   })
 }
+
+// 分享弹窗引用
+const pictureShareModal = ref()
+// 分享链接
+const shareLink = ref<string>('')
 
 // 编辑
 const handleEdit = (picture: any, e: any) => {
@@ -68,13 +79,22 @@ const handleDelete = (picture: any, e: any) => {
   })
 }
 
+// 分享链接
+const handleShare = (picture: any, e: any) => {
+  // 阻止事件冒泡
+  e.stopPropagation()
+  shareLink.value = `${window.location.protocol}//${window.location.host}/picture/detail/${picture.id}`
+  if (pictureShareModal.value) {
+    pictureShareModal.value.openModal()
+  }
+}
+
 // 以图搜图
 const handleSearch = (picture: any, e: any) => {
   // 阻止事件冒泡
   e.stopPropagation()
   window.open(`/picture/search?pictureId=${picture.id}`)
 }
-
 </script>
 
 <template>
@@ -86,7 +106,7 @@ const handleSearch = (picture: any, e: any) => {
       :loading="loading"
     >
       <template #renderItem="{ item: picture }">
-        <a-list-item style="padding: 0 10px" @click="handleClickPicture(picture)" >
+        <a-list-item style="padding: 0 10px" @click="handleClickPicture(picture)">
           <a-card hoverable>
             <template #cover>
               <img
@@ -99,33 +119,30 @@ const handleSearch = (picture: any, e: any) => {
               <template #description>
                 <a-flex>
                   <a-tag :bordered="false">{{ picture.categoryName ?? '默认' }}</a-tag>
-                  <a-tag :bordered="false" v-for="tag in picture.tagDTOList" :key="tag" :color="tag.color">
+                  <a-tag
+                    :bordered="false"
+                    v-for="tag in picture.tagDTOList"
+                    :key="tag"
+                    :color="tag.color"
+                  >
                     {{ tag.name }}
                   </a-tag>
                 </a-flex>
               </template>
             </a-card-meta>
             <template #actions v-if="showOptions">
-              <a-space @click="handleSearch(picture, $event)">
-                <search-outlined />
-                搜索
-              </a-space>
-              <a-space @click="handleEdit(picture, $event)">
-                <edit-outlined />
-                编辑
-              </a-space>
-              <a-space @click="handleDelete(picture, $event)">
-                <delete-outlined />
-                删除
-              </a-space>
+              <search-outlined @click="(e: any) => handleSearch(picture, e)" />
+              <share-alt-outlined @click="(e: any) => handleShare(picture, e)" />
+              <edit-outlined @click="(e: any) => handleEdit(picture, e)" />
+              <delete-outlined @click="(e: any) => handleDelete(picture, e)" />
             </template>
           </a-card>
         </a-list-item>
       </template>
     </a-list>
+
+    <PictureShareModal ref="pictureShareModal" :link="shareLink" />
   </div>
 </template>
 
-<style scoped>
-
-</style>
+<style scoped></style>

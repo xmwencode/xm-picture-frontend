@@ -1,11 +1,16 @@
 import request from '@/api/requet.ts'
 import type {
   ApiResponse,
-  DeleteRequest, ImageSearchResult, PictureEditRequest,
+  DeleteRequest,
+  ImageSearchResult,
+  PictureBatchEditRequest,
+  PictureEditRequest,
   PictureQueryRequest,
-  PictureReviewRequest, PictureUploadByBatchRequest,
+  PictureReviewRequest,
+  PictureUploadByBatchRequest,
   PictureUploadRequest,
-  PictureVO, SearchPictureByPictureRequest
+  PictureVO,
+  SearchPictureByPictureRequest,
 } from '@/types'
 
 /**
@@ -79,4 +84,8 @@ export const uploadPictureByBatchApi = (data: PictureUploadByBatchRequest) => {
 
 export const searchPictureByPictureApi = (data: SearchPictureByPictureRequest) => {
   return request.post('/picture/search', data)
+}
+
+export const batchEditPictureApi = (data: PictureBatchEditRequest) => {
+  return request.post('/picture/edit/batch', data)
 }
