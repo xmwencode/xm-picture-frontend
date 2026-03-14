@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import type { Space, SpaceLevel, SpaceQueryRequest } from '@/types'
-import { computed, createVNode, onMounted, reactive, ref } from 'vue'
+import { computed, createVNode, h, onMounted, reactive, ref } from 'vue'
 import { formatDate } from '@/utils/DayUtils'
 import { message, Modal } from 'ant-design-vue'
-import { ExclamationCircleOutlined } from '@ant-design/icons-vue'
+import { BarChartOutlined, ExclamationCircleOutlined } from '@ant-design/icons-vue'
 import { deleteSpaceApi, listSpaceByPageApi, listSpaceLevelApi } from '@/api/space.ts'
 import { getSpaceLevelColor, getSpaceLevelText, SpaceLevelMap } from '@/enums/SpaceLevelEnum.ts'
 import { formatSize } from '@/utils/MemoryUtils.ts'
@@ -46,14 +46,17 @@ const columns = [
   {
     title: 'ID',
     dataIndex: 'id',
+    width: 160,
   },
   {
     title: '空间名称',
     dataIndex: 'spaceName',
+    width: 160,
   },
   {
     title: '空间级别',
     dataIndex: 'spaceLevel',
+    width: 140,
   },
   {
     title: '使用情况',
@@ -62,14 +65,17 @@ const columns = [
   {
     title: '用户 id',
     dataIndex: 'userId',
+    width: 180,
   },
   {
     title: '创建时间',
     dataIndex: 'createTime',
+    width: 140,
   },
   {
     title: '操作',
     key: 'action',
+    align: 'center'
   },
 ]
 
@@ -222,10 +228,16 @@ onMounted(() => {
           </template>
           <template v-if="column.key === 'action'">
             <a-space>
-              <a-button type="link" :href="`/space/add?id=${record.id}`" target="_blank">
+              <a-button type="link" :href="`/space/add?id=${record.id}`">
                 编辑
               </a-button>
-              <a-divider type="vertical" />
+              <a-button
+                type="link"
+                :href="`/space/analyze?spaceId=${record.id}`"
+                target="_blank"
+              >
+                空间分析
+              </a-button>
               <a-button type="link" danger @click="handleDelete(record)">删除</a-button>
             </a-space>
           </template>

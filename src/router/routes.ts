@@ -3,7 +3,7 @@ import { UserRoleEnum } from '@/enums/UserRoleEnum.ts'
 export const routes = [
   {
     path: '/',
-    redirect: '/home'
+    redirect: '/home',
   },
   {
     path: '/home',
@@ -15,8 +15,8 @@ export const routes = [
     name: 'About',
     component: () => import('@/pages/AboutPage.vue'),
     meta: {
-      access: [UserRoleEnum.ADMIN, UserRoleEnum.USER]
-    }
+      access: [UserRoleEnum.ADMIN, UserRoleEnum.USER],
+    },
   },
   {
     path: '/user/login',
@@ -33,22 +33,22 @@ export const routes = [
     name: 'UserManager',
     component: () => import('@/pages/user/UserManagerPage.vue'),
     meta: {
-      access: [UserRoleEnum.ADMIN]
-    }
+      access: [UserRoleEnum.ADMIN],
+    },
   },
   {
     path: '/picture/add',
     name: 'AddPicture',
     component: () => import('@/pages/picture/PictureHandlePage.vue'),
     meta: {
-      access: [UserRoleEnum.ADMIN, UserRoleEnum.USER]
-    }
+      access: [UserRoleEnum.ADMIN, UserRoleEnum.USER],
+    },
   },
   {
     path: '/picture/detail/:id',
     name: 'PictureDetail',
     component: () => import('@/pages/picture/PictureDetailPage.vue'),
-    props: true
+    props: true,
   },
   {
     path: '/picture',
@@ -74,12 +74,12 @@ export const routes = [
         name: 'TagManager',
         component: () => import('@/pages/picture/TagManagerPage.vue'),
       },
-      {
-        path: '/picture/batch/add',
-        name: 'PictureBatchAdd',
-        component: () => import('@/pages/picture/PictureBatchAddPage.vue'),
-      }
     ],
+  },
+  {
+    path: '/picture/batch/add',
+    name: 'PictureBatchAdd',
+    component: () => import('@/pages/picture/PictureBatchAddPage.vue'),
   },
   {
     path: '/picture/search',
@@ -91,23 +91,23 @@ export const routes = [
     name: 'SpaceManager',
     component: () => import('@/pages/space/SpaceManagerPage.vue'),
     meta: {
-      access: [UserRoleEnum.ADMIN]
-    }
+      access: [UserRoleEnum.ADMIN],
+    },
   },
   {
     path: '/space/add',
     name: 'AddSpace',
     component: () => import('@/pages/space/SpaceHandlePage.vue'),
     meta: {
-      access: [UserRoleEnum.ADMIN, UserRoleEnum.USER]
-    }
+      access: [UserRoleEnum.ADMIN, UserRoleEnum.USER],
+    },
   },
   {
     path: '/space',
     name: 'SpaceBasic',
     component: () => import('@/pages/space/SpaceBasicPage.vue'),
     meta: {
-      access: [UserRoleEnum.ADMIN, UserRoleEnum.USER]
+      access: [UserRoleEnum.ADMIN, UserRoleEnum.USER],
     },
     redirect: '/space/private',
     children: [
@@ -120,9 +120,16 @@ export const routes = [
         path: '/space/detail/:id',
         name: 'SpaceDetail',
         component: () => import('@/pages/space/SpaceDetailPage.vue'),
-        props: true
-      }
-    ]
+        props: true,
+      },
+    ],
   },
-
+  {
+    path: '/space/analyze',
+    name: 'SpaceAnalyze',
+    component: () => import('@/pages/space/SpaceAnalyzePage.vue'),
+    meta: {
+      access: [UserRoleEnum.ADMIN, UserRoleEnum.USER],
+    },
+  },
 ]

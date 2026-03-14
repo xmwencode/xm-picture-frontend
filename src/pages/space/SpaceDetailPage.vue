@@ -8,7 +8,7 @@ import { formatSize } from '@/utils/MemoryUtils.ts'
 import PictureSearchForm from '@/components/PictureSearchForm.vue'
 import { message } from 'ant-design-vue'
 import PictureBatchEditModal from '@/components/PictureBatchEditModal.vue'
-import { EditOutlined } from '@ant-design/icons-vue'
+import { BarChartOutlined, EditOutlined } from '@ant-design/icons-vue'
 
 const props = defineProps<{
   id: string
@@ -95,6 +95,16 @@ onMounted(() => {
           + 批量创建图片
         </a-button>
         <a-button :icon="h(EditOutlined)" @click="handleBatchEdit"> 批量编辑</a-button>
+        <a-button
+          ghost
+          style="background-color: #7597e6"
+          :icon="h(BarChartOutlined)"
+          :href="`/space/analyze?spaceId=${id}`"
+          target="_blank"
+        >
+          空间分析
+        </a-button>
+
         <a-tooltip
           :title="`占用空间 ${formatSize(space?.totalSize)} / ${formatSize(space?.maxSize)}`"
         >

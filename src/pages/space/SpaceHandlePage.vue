@@ -58,7 +58,7 @@ const handleSubmit = async () => {
       if (res.data) {
         message.success('创建成功')
         await router.push({
-          path: `/space/${res.data}`,
+          path: `/space/detail/${res.data}`,
         })
       } else {
         message.error('创建失败')

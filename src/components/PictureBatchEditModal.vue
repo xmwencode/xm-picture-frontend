@@ -21,7 +21,7 @@ const visible = ref(false)
 const openModal = () => {
   formData.pictureIds= props.pictureList.map((picture) => picture.id)
   formData.spaceId = props.spaceId
-  formData.categoryId = ''
+  formData.categoryId = undefined
   formData.tagIds = []
   formData.nameRule = ''
   visible.value = true

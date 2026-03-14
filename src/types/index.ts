@@ -10,6 +10,8 @@ export type * from './tag'
 export * from './tag'
 export type * from './space'
 export * from './space'
+export type * from './analyze'
+export * from './analyze'
 
 
 
