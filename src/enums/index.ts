@@ -1,2 +1,6 @@
 export * from './UserRoleEnum'
 export * from './PictureReviewStatusEnum'
+export * from './SpaceTypeEnum'
+export * from './SpaceLevelEnum'
+export * from './SpacePermissionEnum'
+export * from './SpaceRoleEnum'

@@ -7,6 +7,7 @@ import { message } from 'ant-design-vue'
 import { formatSize } from '@/utils/MemoryUtils.ts'
 import { useRoute } from 'vue-router'
 import router from '@/router'
+import { getSpaceTypeText, SpaceTypeEnum, SpaceTypeMap } from '@/enums/SpaceTypeEnum.ts'
 
 const space = ref<SpaceVO>()
 const loading = ref(false)
@@ -19,7 +20,16 @@ const formData = reactive<SpaceAddRequest | SpaceUpdateRequest>({
   spaceLevel: SpaceLevelEnum.COMMON,
 })
 
+// 空间ID
 const spaceId = computed(() => route.query?.id as string)
+
+// 空间类别
+const spaceType = computed(() => {
+  if (route.query?.type) {
+    return Number(route.query.type)
+  }
+  return SpaceTypeEnum.PRIVATE
+})
 
 // 获取空间信息
 const fetchSpace = async () => {
@@ -54,7 +64,10 @@ const handleSubmit = async () => {
   } else {
     // 创建空间
     try {
-      const res = await addSpaceApi(formData as SpaceAddRequest)
+      const res = await addSpaceApi({
+        ...formData as SpaceAddRequest,
+        spaceType: spaceType.value,
+      })
       if (res.data) {
         message.success('创建成功')
         await router.push({
@@ -89,7 +102,10 @@ onMounted(() => {
   <div id="space-handle-page">
     <!-- 标题栏 -->
     <div class="space-handle-title">
-      <a-typography-title :level="3">{{ spaceId ? '更新空间' : '创建空间' }}</a-typography-title>
+      <a-typography-title :level="3">
+        {{ spaceId ? '更新' : '创建' }}
+        {{ getSpaceTypeText(spaceType) }}
+      </a-typography-title>
     </div>
 
     <a-form layout="vertical" autocomplete="off" :model="formData" @finish="handleSubmit">

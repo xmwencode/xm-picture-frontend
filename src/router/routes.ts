@@ -122,6 +122,12 @@ export const routes = [
         component: () => import('@/pages/space/SpaceDetailPage.vue'),
         props: true,
       },
+      {
+        path: '/spaceUserManage/:id',
+        name: 'SpaceUserManage',
+        component: () => import('@/pages/space/SpaceUserManagePage.vue'),
+        props: true,
+      },
     ],
   },
   {

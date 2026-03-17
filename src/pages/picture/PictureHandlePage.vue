@@ -3,7 +3,7 @@ import PictureUpload from '@/components/PictureUpload.vue'
 import { computed, h, onMounted, reactive, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import type { Category, PictureEditRequest, PictureVO, Tag } from '@/types'
-import { editPictureApi, getCategoryListApi, getPictureByIdApi, getTagListApi } from '@/api'
+import { editPictureApi, getCategoryListApi, getPictureByIdApi, getPictureVOByIdApi, getTagListApi } from '@/api'
 import { message } from 'ant-design-vue'
 import UrlPictureUpload from '@/components/UrlPictureUpload.vue'
 import ImageCropperModal from '@/components/ImageCropperModal.vue'
@@ -63,7 +63,7 @@ const handleSubmit = async () => {
 // 获取图片信息
 const fetchPicture = async () => {
   if (!pictureId.value) return
-  const res = await getPictureByIdApi(pictureId.value)
+  const res = await getPictureVOByIdApi(pictureId.value)
   if (res.data) {
     picture.value = res.data
     formData.id = res.data.id

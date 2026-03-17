@@ -12,6 +12,10 @@ export type * from './space'
 export * from './space'
 export type * from './analyze'
 export * from './analyze'
+export type * from './spaceUser'
+export * from './spaceUser'
+export type * from './spaceRole'
+export * from './spaceRole'
 
 
 

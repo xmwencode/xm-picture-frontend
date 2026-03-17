@@ -1,21 +1,58 @@
 <script setup lang="ts">
 import { useRoute, useRouter } from 'vue-router'
-import { h, ref, watch } from 'vue'
-import {
-  UserOutlined,
-} from '@ant-design/icons-vue'
+import { computed, h, onMounted, ref, watch, watchEffect } from 'vue'
+import { AppstoreAddOutlined, UserOutlined } from '@ant-design/icons-vue'
+import { SpaceTypeEnum } from '@/enums/SpaceTypeEnum.ts'
+import type { SpaceUserVO } from '@/types'
+import { listMyTeamSpace } from '@/api'
+import { message } from 'ant-design-vue'
 
 const route = useRoute()
 const router = useRouter()
+const teamSpaceList = ref<SpaceUserVO[]>([])
 
-const sideMenuItems = ref([
+const fixedMenuItems = ref([
   {
     key: '/space/private',
     label: '私有空间',
-    title: '私有空间',
     icon: () => h(UserOutlined),
   },
+  {
+    key: '/space/add?type=' + SpaceTypeEnum.TEAM,
+    label: '创建空间',
+    icon: () => h(AppstoreAddOutlined),
+  },
 ])
+
+const sideMenuItems = computed(() => {
+  if (teamSpaceList.value.length < 1) {
+    return fixedMenuItems.value
+  }
+  // 展示团队空间的分组
+  const teamSpaceSubMenus = teamSpaceList.value.map((spaceUser) => {
+    return {
+      key: '/space/detail/' + spaceUser.spaceId,
+      label: spaceUser.space.spaceName,
+    }
+  })
+  const teamSpaceMenuGroup = {
+    type: 'group',
+    label: '我的团队',
+    title: '我的团队',
+    children: teamSpaceSubMenus,
+  }
+  return [...fixedMenuItems.value, teamSpaceMenuGroup]
+})
+
+// 查询我加入的团队空间列表
+const fetchMyTeamSpace = async () => {
+  const res: any = await listMyTeamSpace()
+  if (res.data) {
+    teamSpaceList.value = res.data
+  } else {
+    message.error('获取团队空间列表失败')
+  }
+}
 
 // 当前选中的菜单项
 const selectedKeys = ref<string[]>([])
@@ -33,6 +70,10 @@ watch(
 const handleClick = ({ key }: { key: string }) => {
   router.push(key)
 }
+
+onMounted(() => {
+  fetchMyTeamSpace()
+})
 </script>
 
 <template>

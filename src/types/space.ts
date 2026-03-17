@@ -13,6 +13,7 @@ export interface Space {
   userId: string
   userDTO?: User
   createTime: string
+  spaceType?: number
 }
 
 export interface SpaceVO {
@@ -26,11 +27,13 @@ export interface SpaceVO {
   userId: string
   userNickname?: string
   createTime: string
+  spaceType?: number
 }
 
 export interface SpaceAddRequest {
   spaceName: string
   spaceLevel: number
+  spaceType?: number
 }
 
 export interface SpaceUpdateRequest {

@@ -47,6 +47,7 @@ export interface PictureVO {
   userId?: string
   userNickname?: string
   spaceId?: string
+  permissionList?: string[]
 }
 
 export interface PictureUpdateRequest {

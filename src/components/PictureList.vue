@@ -13,6 +13,7 @@ import {
 } from '@ant-design/icons-vue'
 import { deletePictureApi } from '@/api'
 import PictureShareModal from '@/components/PictureShareModal.vue'
+import { SPACE_PERMISSION_ENUM } from '@/enums'
 
 interface Props {
   dataList?: PictureVO[]
@@ -131,8 +132,22 @@ const handleSearch = (picture: any, e: any) => {
             <template #actions v-if="showOptions">
               <search-outlined @click="(e: any) => handleSearch(picture, e)" />
               <share-alt-outlined @click="(e: any) => handleShare(picture, e)" />
-              <edit-outlined @click="(e: any) => handleEdit(picture, e)" />
-              <delete-outlined @click="(e: any) => handleDelete(picture, e)" />
+              <edit-outlined
+                v-if="
+                  !picture.spaceId ||
+                  !picture.permissionList ||
+                  picture.permissionList.includes(SPACE_PERMISSION_ENUM.PICTURE_EDIT)
+                "
+                @click="(e: any) => handleEdit(picture, e)"
+              />
+              <delete-outlined
+                v-if="
+                  !picture.spaceId ||
+                  !picture.permissionList ||
+                  picture.permissionList.includes(SPACE_PERMISSION_ENUM.PICTURE_DELETE)
+                "
+                @click="(e: any) => handleDelete(picture, e)"
+              />
             </template>
           </a-card>
         </a-list-item>
