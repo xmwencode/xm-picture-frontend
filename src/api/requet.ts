@@ -3,12 +3,19 @@ import { ApiSuccessCode, TOKEN_NAME } from '@/types'
 import { message } from 'ant-design-vue'
 import { useUserStore } from '@/stores/user.ts'
 
-// 区分开发环境与生产环境
-const DEV_BASE_URL = 'http://localhost:18080/api'
-const PROD_BASE_URL = 'http://localhost:18080/api'
+// 区分开发/生产环境（Vite用这个，Webpack把`import.meta.env`换成`process.env`）
+const isDev = import.meta.env.MODE === 'development'
+
+// 开发环境：直连本地后端，**不带/api**（开发环境不需要反向代理）
+const DEV_BASE_URL = 'http://localhost:18080'
+// 生产环境：相对路径 /api，自动继承页面的81端口 → http://101.200.0.15:81/api/...
+const PROD_BASE_URL = '/api'
+
+// 自动切换环境
+const baseURL = isDev ? DEV_BASE_URL : PROD_BASE_URL
 
 const request = axios.create({
-  baseURL: DEV_BASE_URL,
+  baseURL: baseURL,
   timeout: 60 * 1000,
   withCredentials: true,
 })
